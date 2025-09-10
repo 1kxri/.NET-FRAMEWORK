@@ -65,16 +65,23 @@ namespace labrab1
                         Console.Write("Введите радиус:");
                         double rad;
                         rad = Convert.ToDouble(Console.ReadLine());
-                        double C, S, V;
-                        C = 2 * 3.14 * rad;
-                        S = 3.14 * rad * rad;
-                        V = (4 / 3) * 3.14 * rad * rad * rad;
-                        Console.WriteLine("Длина окружности:");
-                        Console.WriteLine(C);
-                        Console.WriteLine("Площадь круга:");
-                        Console.WriteLine(S);
-                        Console.WriteLine("Объем шара:");
-                        Console.WriteLine(V);
+                        if (rad < 0)
+                        {
+                            Console.WriteLine("Ошибка: радиус не может быть отрицательным!");
+                        }
+                        else
+                        {
+                            double C, S, V;
+                            C = 2 * 3.14 * rad;
+                            S = 3.14 * rad * rad;
+                            V = (4.0 / 3.0) * 3.14 * rad * rad * rad;
+                            Console.WriteLine("Длина окружности:");
+                            Console.WriteLine(C);
+                            Console.WriteLine("Площадь круга:");
+                            Console.WriteLine(S);
+                            Console.WriteLine("Объем шара:");
+                            Console.WriteLine(V);
+                        }
                         break;
 
                     case 3:
