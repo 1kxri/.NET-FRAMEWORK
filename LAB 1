@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 namespace labrab1
 {
     class labrab1
@@ -39,7 +40,7 @@ namespace labrab1
 
                         Console.WriteLine("Результат выражения a:");
                         double denominator = z + (x * x) / 4;
-                        if (Math.Abs(denominator) < 0.000001)
+                        if (Math.Abs(denominator) == 0)
                         {
                             Console.WriteLine("Ошибка: знаменатель в выражении a равен нулю!");
                         }
@@ -156,83 +157,187 @@ namespace labrab1
 
                     case 4:
                         //4
-                        Console.WriteLine("Задание 4");
-                        Console.Write("Введите k:");
-                        int k;
-                        k = Convert.ToInt32(Console.ReadLine());
-                        switch (k)
+                        try
                         {
-                            case 1:
-                                Console.Write("Введите полупериметр:");
-                                double p1;
-                                p1 = Convert.ToDouble(Console.ReadLine());
-                                Console.Write("Введите длинy:");
-                                double l1;
-                                l1 = Convert.ToDouble(Console.ReadLine());
-                                double S1 = p1 * l1;
-                                Console.WriteLine(S1);
-                                break;
-                            case 2:
-                                Console.Write("Введите полупериметр:");
-                                double p2;
-                                p2 = Convert.ToDouble(Console.ReadLine());
-                                Console.Write("Введите высоту:");
-                                double h1;
-                                h1 = Convert.ToDouble(Console.ReadLine());
-                                double S2 = p2 * (h1 / 2);
-                                Console.WriteLine(S2);
-                                break;
-                            case 3:
-                                Console.WriteLine("Введите радиус:");
-                                double R;
-                                R = Convert.ToDouble(Console.ReadLine());
-                                Console.WriteLine("Введите высоту:");
-                                double h2;
-                                h2 = Convert.ToDouble(Console.ReadLine());
-                                double S3 = 2 * 3.14 * R * h2;
-                                Console.WriteLine(S3);
-                                break;
-                            case 4:
-                                Console.WriteLine("Введите радиус:");
-                                double R2;
-                                R2 = Convert.ToDouble(Console.ReadLine());
-                                Console.WriteLine("Введите длину:");
-                                double l2;
-                                l2 = Convert.ToDouble(Console.ReadLine());
-                                double S4 = 2 * 3.14 * R2 * l2;
-                                Console.WriteLine(S4);
-                                break;
-                            case 5:
-                                Console.WriteLine("Введите радиус:");
-                                double R3;
-                                R3 = Convert.ToDouble(Console.ReadLine());
-                                double S5 = 3.14 * R3 * R3;
-                                Console.WriteLine(S5);
-                                break;
-                            case 6:
-                                Console.WriteLine("Введите радиус:");
-                                double R6;
-                                R6 = Convert.ToDouble(Console.ReadLine());
-                                Console.WriteLine("Введите высоту:");
-                                double h3;
-                                h3 = Convert.ToDouble(Console.ReadLine());
-                                Console.WriteLine("Введите сторону:");
-                                double a6;
-                                a6 = Convert.ToDouble(Console.ReadLine());
-                                double S6 = 3.14 * R6 * (2 * h3 + a6);
-                                Console.WriteLine(S6);
-                                break;
-                            default:
-                                break;
+                            Console.WriteLine("Задание 4");
+                            Console.Write("Введите k:");
+                            int k;
+                            k = Convert.ToInt32(Console.ReadLine());
+                            switch (k)
+                            {
+                                case 1:
+                                    Console.Write("Введите полупериметр:");
+                                    double p1;
+                                    p1 = Convert.ToDouble(Console.ReadLine());
+                                    if (p1 < 0)
+                                    {
+                                        Console.WriteLine("Ошибка: полупериметр не может быть отрицательным!");
+                                    }
+                                    else
+                                    {
+                                        Console.Write("Введите длинy:");
+                                        double l1;
+                                        l1 = Convert.ToDouble(Console.ReadLine());
+                                        if (l1 < 0)
+                                        {
+                                            Console.WriteLine("Ошибка: длина не может быть отрицательная!");
+                                        }
+                                        else
+                                        {
+                                            double S1 = p1 * l1;
+                                            Console.WriteLine(S1);
+                                        }
+                                    }
+                                    break;
+
+                                case 2:
+                                    Console.Write("Введите полупериметр:");
+                                    double p2;
+                                    p2 = Convert.ToDouble(Console.ReadLine());
+                                    if (p2 < 0)
+                                    {
+                                        Console.WriteLine("Ошибка: полупериметр не может быть отрицательным!");
+                                    }
+                                    else
+                                    {
+                                        Console.Write("Введите высоту:");
+                                        double h1;
+                                        h1 = Convert.ToDouble(Console.ReadLine());
+                                        if (h1 < 0)
+                                        {
+                                            Console.WriteLine("Ошибка: высота не может быть отрицательная!");
+                                        }
+                                        double S2 = p2 * (h1 / 2);
+                                        Console.WriteLine(S2);
+                                    }
+                                    break;
+                                case 3:
+                                    Console.WriteLine("Введите радиус:");
+                                    double R;
+                                    R = Convert.ToDouble(Console.ReadLine());
+                                    if (R < 0)
+                                    {
+                                        Console.WriteLine("Ошибка: радиус не может быть отрицательным!");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Введите высоту:");
+                                        double h2;
+                                        h2 = Convert.ToDouble(Console.ReadLine());
+                                        if (h2 < 0)
+                                        {
+                                            Console.WriteLine("Ошибка: высота не может быть отрицательная!");
+                                        }
+                                        else
+                                        {
+                                            double S3 = 2 * 3.14 * R * h2;
+                                            Console.WriteLine(S3);
+                                        }
+                                    }
+                                    break;
+                                case 4:
+                                    Console.WriteLine("Введите радиус:");
+                                    double R2;
+                                    R2 = Convert.ToDouble(Console.ReadLine());
+                                    if (R2 < 0)
+                                    {
+                                        Console.WriteLine("Ошибка: радиус не может быть отрицательным!");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Введите длину:");
+                                        double l2;
+                                        l2 = Convert.ToDouble(Console.ReadLine());
+                                        if (l2 < 0)
+                                        {
+                                            Console.WriteLine("Ошибка: длина не может быть отрицательная!");
+                                        }
+                                        else
+                                            {
+                                            double S4 = 2 * 3.14 * R2 * l2;
+                                            Console.WriteLine(S4);
+                                             }
+                                    }
+                                    break;
+                                case 5:
+                                    Console.WriteLine("Введите радиус:");
+                                    double R3;
+                                    R3 = Convert.ToDouble(Console.ReadLine());
+                                    if (R3 < 0)
+                                    {
+                                        Console.WriteLine("Ошибка: радиус не может быть отрицательным!");
+                                    }
+                                    else
+                                    {
+
+                                        double S5 = 3.14 * R3 * R3; 
+                                        Console.WriteLine(S5);
+                                    }
+                                    break;
+                                case 6:
+                                    Console.WriteLine("Введите радиус:");
+                                    double R6;
+                                    R6 = Convert.ToDouble(Console.ReadLine());
+                                    if (R6 < 0)
+                                    {
+                                        Console.WriteLine("Ошибка: радиус не может быть отрицательным!");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Введите высоту:");
+                                        double h3;
+                                        h3 = Convert.ToDouble(Console.ReadLine());
+                                        if (h3 < 0)
+                                        {
+                                            Console.WriteLine("Ошибка: высота не может быть отрицательная!");
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Введите сторону:");
+                                            double a6;
+                                            a6 = Convert.ToDouble(Console.ReadLine());
+                                            if (a6 < 0)
+                                            {
+                                                Console.WriteLine("Ошибка: размер стороны не может быть отрицательным!");
+                                            }
+                                            else
+                                            {
+                                                double S6 = 3.14 * R6 * (2 * h3 + a6);
+                                                Console.WriteLine(S6);
+                                            }
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Ошибка! Введите число");
                         }
                         break;
 
                     case 5:
                         //5
                         airplane air;
-                        air.name = "Aeroflot";
-                        air.year = 2025;
-                        air.amount = 52;
+                        Console.Write("Название самолёта: ");
+                        air.name = Console.ReadLine();
+
+                        while (true)
+                        {
+                            Console.Write("Год выпуска: ");
+                            if (int.TryParse(Console.ReadLine(), out air.year) && air.year > 0) break;
+                            Console.WriteLine("Введите корректный год.");
+                        }
+
+                        while (true)
+                        {
+                            Console.Write("Кол-во мест: ");
+                            if (int.TryParse(Console.ReadLine(), out air.amount) && air.amount >= 0) break;
+                            Console.WriteLine("Введите корректное число мест.");
+                        }
+
                         air.DisplayInfo();
                         break;
 
