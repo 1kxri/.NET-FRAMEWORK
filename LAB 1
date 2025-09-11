@@ -24,6 +24,8 @@ namespace labrab1
                 {
                     case 1:
                         //1
+                        try 
+                        { 
                         Console.WriteLine("Задание 1");
                         Console.Write("Введите x:");
                         double x;
@@ -55,9 +57,16 @@ namespace labrab1
                         }
                         else
                         {
-                            Console.WriteLine("Делить на 0 запрещено, введите другое значение х");
+                            Console.WriteLine("Ошибка: знаменатель в выражении a равен нулю!");
                         }
                         break;
+                        }
+                        catch
+                        {
+                             Console.WriteLine("Ошибка! Введите число");
+                        }
+                        break;
+                        
 
                     case 2:
                         //2
