@@ -42,17 +42,31 @@ namespace lab2_net2
                 double y = double.Parse(textBox2.Text);
                 double z = double.Parse(textBox3.Text);
 
-                double a = Math.Log(Math.Abs((y - Math.Sqrt(Math.Abs(x))) * (x - (y / (z + (x * x) / 4)))));
-                double b = x - ((x * x) / 3) + ((x + y) / x);
+                double denominator = z + (x * x) / 4;
+                if (Math.Abs(denominator) < 0.000001)
+                {
+                    textBox4.Text = "Ошибка: знаменатель равен нулю!";
+                }
+                else
+                {
+                    double a = Math.Log(Math.Abs((y - Math.Sqrt(Math.Abs(x))) * (x - (y / denominator))));
+                    textBox4.Text = a.ToString("F4");
+                }
 
-                textBox4.Text = a.ToString("F4");
-                textBox5.Text = b.ToString("F4");
+                if (Math.Abs(x) < 0.000001)
+                {
+                    textBox5.Text = "Ошибка: деление на ноль!";
+                }
+                else
+                {
+                    double b = x - ((x * x) / 3) + ((x + y) / x);
+                    textBox5.Text = b.ToString("F4");
+                }
             }
             catch
             {
-                MessageBox.Show("Введите числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Введите корректные числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -61,9 +75,15 @@ namespace lab2_net2
             {
                 double rad = double.Parse(textBox6.Text);
 
-                double C = 2 * 3.14 * rad;
-                double S = 3.14 * rad * rad;
-                double V = (4.0 / 3.0) * 3.14 * rad * rad * rad;
+                if (rad < 0)
+                {
+                    MessageBox.Show("Ошибка: радиус не может быть отрицательным!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                double C = 2 * Math.PI * rad;
+                double S = Math.PI * rad * rad;
+                double V = (4.0 / 3.0) * Math.PI * rad * rad * rad;
 
                 textBox7.Text = C.ToString("F4");
                 textBox8.Text = S.ToString("F4");
@@ -71,7 +91,7 @@ namespace lab2_net2
             }
             catch
             {
-                MessageBox.Show("Введите числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Введите корректное число", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -133,12 +153,11 @@ namespace lab2_net2
                 }
 
                 textBox13.Text = max.ToString("F4");
-                textBox14.Text = $"{min.ToString("F2")}, {mid.ToString("F2")}, {max.ToString("F2")}";
-
+                textBox14.Text = $"{min:F2}, {mid:F2}, {max:F2}";
             }
             catch
             {
-                MessageBox.Show("Введите числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Введите корректные числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -149,14 +168,23 @@ namespace lab2_net2
                 double p1 = double.Parse(textBox15.Text);
                 double l1 = double.Parse(textBox16.Text);
 
+                if (p1 < 0)
+                {
+                    MessageBox.Show("Ошибка: полупериметр не может быть отрицательным!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                if (l1 < 0)
+                {
+                    MessageBox.Show("Ошибка: длина не может быть отрицательной!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 double S1 = p1 * l1;
-
                 textBox17.Text = S1.ToString("F4");
-
             }
             catch
             {
-                MessageBox.Show("Введите числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Введите корректные числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -167,14 +195,23 @@ namespace lab2_net2
                 double p2 = double.Parse(textBox18.Text);
                 double h1 = double.Parse(textBox19.Text);
 
+                if (p2 < 0)
+                {
+                    MessageBox.Show("Ошибка: полупериметр не может быть отрицательным!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                if (h1 < 0)
+                {
+                    MessageBox.Show("Ошибка: высота не может быть отрицательной!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 double S2 = p2 * (h1 / 2);
-
                 textBox20.Text = S2.ToString("F4");
-
             }
             catch
             {
-                MessageBox.Show("Введите числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Введите корректные числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -185,14 +222,23 @@ namespace lab2_net2
                 double R = double.Parse(textBox21.Text);
                 double h2 = double.Parse(textBox22.Text);
 
-                double S3 = 2 * 3.14 * R * h2;
+                if (R < 0)
+                {
+                    MessageBox.Show("Ошибка: радиус не может быть отрицательным!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                if (h2 < 0)
+                {
+                    MessageBox.Show("Ошибка: высота не может быть отрицательной!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
+                double S3 = 2 * Math.PI * R * h2;
                 textBox23.Text = S3.ToString("F4");
-
             }
             catch
             {
-                MessageBox.Show("Введите числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Введите корректные числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -203,14 +249,23 @@ namespace lab2_net2
                 double R2 = double.Parse(textBox24.Text);
                 double l2 = double.Parse(textBox25.Text);
 
-                double S4 = 2 * 3.14 * R2 * l2;
+                if (R2 < 0)
+                {
+                    MessageBox.Show("Ошибка: радиус не может быть отрицательным!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                if (l2 < 0)
+                {
+                    MessageBox.Show("Ошибка: длина не может быть отрицательной!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
+                double S4 = 2 * Math.PI * R2 * l2;
                 textBox26.Text = S4.ToString("F4");
-
             }
             catch
             {
-                MessageBox.Show("Введите числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Введите корректные числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -220,14 +275,18 @@ namespace lab2_net2
             {
                 double R3 = double.Parse(textBox27.Text);
 
-                double S5 = 3.14 * R3 * R3;
+                if (R3 < 0)
+                {
+                    MessageBox.Show("Ошибка: радиус не может быть отрицательным!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
+                double S5 = Math.PI * R3 * R3;
                 textBox28.Text = S5.ToString("F4");
-
             }
             catch
             {
-                MessageBox.Show("Введите числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Введите корректное число", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -239,14 +298,29 @@ namespace lab2_net2
                 double h3 = double.Parse(textBox30.Text);
                 double a6 = double.Parse(textBox31.Text);
 
-                double S6 = 3.14 * R6 * (2 * h3 + a6);
+  
+                if (R6 < 0)
+                {
+                    MessageBox.Show("Ошибка: радиус не может быть отрицательным!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                if (h3 < 0)
+                {
+                    MessageBox.Show("Ошибка: высота не может быть отрицательной!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                if (a6 < 0)
+                {
+                    MessageBox.Show("Ошибка: сторона не может быть отрицательной!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
+                double S6 = Math.PI * R6 * (2 * h3 + a6);
                 textBox32.Text = S6.ToString("F4");
-
             }
             catch
             {
-                MessageBox.Show("Введите числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Введите корректные числа", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -258,25 +332,19 @@ namespace lab2_net2
 
                 airplane.name = textBox33.Text;
 
-                if (int.TryParse(textBox34.Text, out int year))
+                if (!int.TryParse(textBox34.Text, out int year) || year <= 0)
                 {
-                    airplane.year = year;
-                }
-                else
-                {
-                    MessageBox.Show("Введите корректный год (целое число)", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Введите корректный год (положительное целое число)", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
+                airplane.year = year;
 
-                if (int.TryParse(textBox35.Text, out int amount))
+                if (!int.TryParse(textBox35.Text, out int amount) || amount < 0)
                 {
-                    airplane.amount = amount;
-                }
-                else
-                {
-                    MessageBox.Show("Введите корректное количество мест (целое число)", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Введите корректное количество мест (неотрицательное целое число)", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
+                airplane.amount = amount;
 
                 textBox37.Text = airplane.DisplayInfo();
             }
