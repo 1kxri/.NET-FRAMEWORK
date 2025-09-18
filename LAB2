@@ -11,6 +11,17 @@ using System.Windows.Forms;
 
 namespace lab2_net2
 {
+    struct Airplane
+    {
+        public string name;
+        public int year;
+        public int amount;
+
+        public string DisplayInfo()
+        {
+            return ($"Название: {name} \r\nГод: {year} \r\nКол-во мест: {amount}");
+        }
+    }
     public partial class Form1 : Form
     {
         public Form1()
@@ -241,11 +252,38 @@ namespace lab2_net2
 
         private void button10_Click(object sender, EventArgs e)
         {
-            string name = textBox33.Text;
-            double year = double.Parse(textBox34.Text);
-            double amount = double.Parse(textBox35.Text);
+            try
+            {
+                Airplane airplane;
 
-            textBox37.Text = $"{name}, {year.ToString("F2")}, {amount.ToString("F2")}";
+                airplane.name = textBox33.Text;
+
+                if (int.TryParse(textBox34.Text, out int year))
+                {
+                    airplane.year = year;
+                }
+                else
+                {
+                    MessageBox.Show("Введите корректный год (целое число)", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (int.TryParse(textBox35.Text, out int amount))
+                {
+                    airplane.amount = amount;
+                }
+                else
+                {
+                    MessageBox.Show("Введите корректное количество мест (целое число)", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                textBox37.Text = airplane.DisplayInfo();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }
