@@ -1,0 +1,87 @@
+using System;
+using System.Linq;
+namespace labrab1
+{
+    class labrab1
+    {
+        static void Main()
+        {
+            int choice;
+
+            do
+            {
+                Console.WriteLine("\nВыберите номер задания 2,3 или 0 для выхода:");
+                Console.WriteLine("1 - Задание 2");
+                Console.WriteLine("2 - Задание 3");
+                Console.WriteLine("0 - Выход");
+
+                Console.Write("Ваш выбор: ");
+                choice = Convert.ToInt32(Console.ReadLine());
+
+                switch (choice)
+                {
+                    case 1:
+                            Console.Write("Введите числа через пробел: ");
+                            string line = Console.ReadLine();
+
+                            string[] parts = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+
+
+                            int evenCount = 0;
+                            for (int i = 0; i < parts.Length; i++)
+                            {
+                                if (int.TryParse(parts[i], out int number))
+                                {
+                                    if (number % 2 == 0) evenCount++;
+                                }
+                            }
+
+                            Console.WriteLine($"Количество чётных чисел: {evenCount}");
+
+                        break;
+
+
+                    case 2:
+                        int k;
+                        while (true)
+                        {
+                            Console.Write("Введите число k (больше 0): ");
+                            string input = Console.ReadLine();
+
+                            if (int.TryParse(input, out k) && k > 0)
+                            {
+                                break;
+                            }
+                            Console.WriteLine("Ошибка! Введите целое положительное число.");
+                        }
+
+                        Console.WriteLine($"\nЧисла от 1 до {k}, которые оканчиваются на 3:");
+
+                        int count = 0;
+                        for (int i = 1; i <= k; i++)
+                        {
+                            if (i % 10 == 3)
+                            {
+                                Console.Write(i + " ");
+                                count++;
+                            }
+                        }
+
+                        if (count == 0)
+                        {
+                            Console.WriteLine("Таких чисел не найдено");
+                        }
+                break;
+
+                    case 0:
+                        Console.WriteLine("Выход из программы...");
+                        break;
+
+                    default:
+                        Console.WriteLine("Неверный выбор! Пожалуйста, выберите от 0 до 2.");
+                        break;
+                }
+            } while (choice != 0);
+        }
+    }
+}
