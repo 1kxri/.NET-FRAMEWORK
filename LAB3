@@ -1,87 +1,120 @@
 using System;
-using System.Linq;
-namespace labrab1
+
+namespace NETFramework_cs_3
 {
-    class labrab1
+    class NETFramework_cs_3
     {
         static void Main()
         {
             int choice;
 
-            do
+        startMenu:
+            try
             {
-                Console.WriteLine("\nВыберите номер задания 2,3 или 0 для выхода:");
-                Console.WriteLine("1 - Задание 2");
-                Console.WriteLine("2 - Задание 3");
-                Console.WriteLine("0 - Выход");
-
-                Console.Write("Ваш выбор: ");
-                choice = Convert.ToInt32(Console.ReadLine());
-
-                switch (choice)
+                do
                 {
-                    case 1:
+                    Console.WriteLine("\nВыберите номер задания 2,3,4* или 0 для выхода:");
+                    Console.WriteLine("1 - Задание 2");
+                    Console.WriteLine("2 - Задание 3");
+                    Console.WriteLine("3 - Задание 4*");
+                    Console.WriteLine("0 - Выход");
+                    Console.Write("Ваш выбор: ");
+
+                    choice = Convert.ToInt32(Console.ReadLine());
+
+                    switch (choice)
+                    {
+                        case 1:
                             Console.Write("Введите числа через пробел: ");
                             string line = Console.ReadLine();
 
-                            string[] parts = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-
-
-                            int evenCount = 0;
-                            for (int i = 0; i < parts.Length; i++)
+                            if (string.IsNullOrWhiteSpace(line))
                             {
-                                if (int.TryParse(parts[i], out int number))
+                                Console.WriteLine("Пустой ввод.");
+                                break;
+                            }
+
+                            string[] numbers = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            int Count_1 = 0;
+
+                            for (int i = 0; i < numbers.Length; i++)
+                            {
+                                if (int.TryParse(numbers[i], out int number1))
                                 {
-                                    if (number % 2 == 0) evenCount++;
+                                    if (number1 % 2 == 0) Count_1++;
                                 }
                             }
 
-                            Console.WriteLine($"Количество чётных чисел: {evenCount}");
+                            Console.WriteLine($"Количество чётных чисел: {Count_1}");
+                            break;
 
-                        break;
-
-
-                    case 2:
-                        int k;
-                        while (true)
-                        {
-                            Console.Write("Введите число k (больше 0): ");
+                        case 2:
+                            int k, Count_2 = 0;
+                        startSecond:
+                            Console.Write("Введите число K: ");
                             string input = Console.ReadLine();
 
-                            if (int.TryParse(input, out k) && k > 0)
+                            if (!int.TryParse(input, out k) || k < 1)
                             {
-                                break;
+                                Console.WriteLine("Ошибка. Введите целое положительное число.");
+                                goto startSecond;
                             }
-                            Console.WriteLine("Ошибка! Введите целое положительное число.");
-                        }
 
-                        Console.WriteLine($"\nЧисла от 1 до {k}, которые оканчиваются на 3:");
+                            Console.WriteLine($"Числа от 1 до {k}, которые оканчиваются на 3:");
 
-                        int count = 0;
-                        for (int i = 1; i <= k; i++)
-                        {
-                            if (i % 10 == 3)
+                            for (int i = 1; i <= k; i++)
                             {
-                                Console.Write(i + " ");
-                                count++;
+                                if (i % 10 == 3)
+                                {
+                                    Console.Write(i + " ");
+                                    Count_2++;
+                                }
                             }
-                        }
 
-                        if (count == 0)
-                        {
-                            Console.WriteLine("Таких чисел не найдено");
-                        }
-                break;
+                            if (Count_2 == 0) Console.WriteLine("Таких чисел не существует");
+                            Console.WriteLine();
+                            break;
 
-                    case 0:
-                        Console.WriteLine("Выход из программы...");
-                        break;
+                        case 3:
+                            double number, Count_3 = 0;
+                            Console.Write("Введите последовательность чисел, заканчивающуюся на ноль\n");
 
-                    default:
-                        Console.WriteLine("Неверный выбор! Пожалуйста, выберите от 0 до 2.");
-                        break;
-                }
-            } while (choice != 0);
+                            do
+                            {
+                            startInput:
+                                Console.Write("Введите число: ");
+                                string input3 = Console.ReadLine();
+
+                                if (!double.TryParse(input3, out number))
+                                {
+                                    Console.WriteLine("Ошибка, введите число");
+                                    goto startInput;
+                                }
+
+                                if (number != 0)
+                                {
+                                    Count_3++;
+                                }
+
+                            } while (number != 0);
+
+                            Console.WriteLine($"Вы ввели {Count_3} чисел(а) до нуля.");
+                            break;
+
+                        case 0:
+                            Console.WriteLine("Выход из программы");
+                            break;
+                        default:
+                            Console.WriteLine("Несуществующее действие, попробуйте снова");
+                            break;
+                    }
+                } while (choice != 0);
+            }
+            catch
+            {
+                Console.WriteLine("Ошибка. Введите целочисленное число");
+                goto startMenu;
+            }
         }
     }
 }
