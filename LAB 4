@@ -1,0 +1,171 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace lab4
+{
+    internal class Program
+    {
+        static void Main()
+        {
+            int choice;
+
+        startMenu:
+            try
+            {
+                do
+                {
+                    Console.WriteLine("\nВыберите номер задания 1,2,3,4 или 0 для выхода:");
+                    Console.Write("Ваш выбор: ");
+
+                    choice = Convert.ToInt32(Console.ReadLine());  
+
+                    switch (choice)
+                    {
+                        case 1:
+                            Console.Write("Введите n: ");
+                            int n = Convert.ToInt32(Console.ReadLine());
+
+                            double[] array_1 = new double[n];
+
+                            Random rnd = new Random();
+
+                            for (int i = 0; i < n; i++)
+                            {
+                                int k = rnd.Next(0, 9);
+
+                                array_1[i] = (Math.Pow(-1, k)) * 1 / (n * Math.Sqrt(Math.Pow(3, k)));
+
+                                Console.WriteLine($"array[{i}], k = {k}, {array_1[i]:F3}");
+                            }
+
+                            Console.Write("Введите m: ");
+                            int m = Convert.ToInt32(Console.ReadLine());
+
+                            double[,] array_2 = new double[n, m];
+
+                            for (int i = 0; i < n; i++)
+                            {
+                                for (int j = 0; j < m; j++)
+                                {
+                                    int o = rnd.Next(0, 9);
+
+                                    array_2[i, j] = (Math.Pow(-1, o)) * 1 / (n * Math.Sqrt(Math.Pow(3, o)));
+
+                                    Console.WriteLine($"array[{i}, {j}], k = {o}, {array_2[i, j]:F3}");
+
+                                }
+                            }
+                            Console.ReadKey();
+                            break;
+
+                        case 2:
+                            Console.Write("Введите элементы массива A через пробел: ");
+                            string[] inputA = Console.ReadLine().Split(' ');
+                            int[] A = new int[inputA.Length];
+                            for (int i = 0; i < inputA.Length; i++)
+                            {
+                                A[i] = Convert.ToInt32(inputA[i]);
+                            }
+
+                            Console.Write("Введите элементы массива B через пробел: ");
+                            string[] inputB = Console.ReadLine().Split(' ');
+                            int[] B = new int[inputB.Length];
+                            for (int i = 0; i < inputB.Length; i++)
+                            {
+                                B[i] = Convert.ToInt32(inputB[i]);
+                            }
+
+                            Console.Write("Введите значение t: ");
+                            int t = Convert.ToInt32(Console.ReadLine());
+
+                            int countA = 0;
+                            for (int i = 0; i < A.Length; i++)
+                            {
+                                if (A[i] > t)
+                                {
+                                    countA++;
+                                }
+                            }
+
+                            int countB = 0;
+                            for (int i = 0; i < B.Length; i++)
+                            {
+                                if (B[i] > t)
+                                {
+                                    countB++;
+                                }
+                            }
+
+                            Console.WriteLine($"\nВ массиве A элементов > {t}: {countA}");
+                            Console.WriteLine($"В массиве B элементов > {t}: {countB}");
+
+                            if (countA < countB)
+                            {
+                                Console.WriteLine("\nМассив A (меньшее количество элементов > t):");
+                                for (int i = 0; i < A.Length; i++)
+                                {
+                                    Console.Write(A[i] + " ");
+                                }
+
+                                Console.WriteLine("\nМассив B:");
+                                for (int i = 0; i < B.Length; i++)
+                                {
+                                    Console.Write(B[i] + " ");
+                                }
+                            }
+                            else if (countB < countA)
+                            {
+                                Console.WriteLine("\nМассив B (меньшее количество элементов > t):");
+                                for (int i = 0; i < B.Length; i++)
+                                {
+                                    Console.Write(B[i] + " ");
+                                }
+
+                                Console.WriteLine("\nМассив A:");
+                                for (int i = 0; i < A.Length; i++)
+                                {
+                                    Console.Write(A[i] + " ");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("\nМассив A (количества равны):");
+                                for (int i = 0; i < A.Length; i++)
+                                {
+                                    Console.Write(A[i] + " ");
+                                }
+
+                                Console.WriteLine("\nМассив B:");
+                                for (int i = 0; i < B.Length; i++)
+                                {
+                                    Console.Write(B[i] + " ");
+                                }
+                            }
+
+                            Console.WriteLine();
+                            Console.ReadKey();
+                            break;
+
+                        case 3:
+
+                            break;
+                        case 0:
+                            Console.WriteLine("Выход из программы");
+                            break;
+                        default:
+                            Console.WriteLine("Несуществующее действие, попробуйте снова");
+                            break;
+                    }
+                } while (choice != 0);
+            }
+            catch
+            {
+                Console.WriteLine("Ошибка. Введите целочисленное число");
+                goto startMenu;
+            }
+        }
+    }
+}
