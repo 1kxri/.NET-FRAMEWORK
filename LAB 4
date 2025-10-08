@@ -1,8 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace lab4
 {
@@ -17,10 +13,10 @@ namespace lab4
             {
                 do
                 {
-                    Console.WriteLine("\nВыберите номер задания 1,2,3,4 или 0 для выхода:");
+                    Console.WriteLine("\nВыберите номер задания 1, 2, 3, 4 или 0 для выхода:");
                     Console.Write("Ваш выбор: ");
 
-                    choice = Convert.ToInt32(Console.ReadLine());  
+                    choice = Convert.ToInt32(Console.ReadLine());
 
                     switch (choice)
                     {
@@ -29,21 +25,17 @@ namespace lab4
                             int n = Convert.ToInt32(Console.ReadLine());
 
                             double[] array_1 = new double[n];
-
                             Random rnd = new Random();
 
                             for (int i = 0; i < n; i++)
                             {
                                 int k = rnd.Next(0, 9);
-
-                                array_1[i] = (Math.Pow(-1, k)) * 1 / (n * Math.Sqrt(Math.Pow(3, k)));
-
-                                Console.WriteLine($"array[{i}], k = {k}, {array_1[i]:F3}");
+                                array_1[i] = Math.Pow(-1, k) * (1.0 / (n * Math.Sqrt(Math.Pow(3, k))));
+                                Console.WriteLine($"array[{i}], k = {k}, {array_1[i]:F5}");
                             }
 
                             Console.Write("Введите m: ");
                             int m = Convert.ToInt32(Console.ReadLine());
-
                             double[,] array_2 = new double[n, m];
 
                             for (int i = 0; i < n; i++)
@@ -51,53 +43,29 @@ namespace lab4
                                 for (int j = 0; j < m; j++)
                                 {
                                     int o = rnd.Next(0, 9);
-
-                                    array_2[i, j] = (Math.Pow(-1, o)) * 1 / (n * Math.Sqrt(Math.Pow(3, o)));
-
-                                    Console.WriteLine($"array[{i}, {j}], k = {o}, {array_2[i, j]:F3}");
-
+                                    array_2[i, j] = Math.Pow(-1, o) * (1.0 / (n * Math.Sqrt(Math.Pow(3, o))));
+                                    Console.WriteLine($"array[{i}, {j}], k = {o}, {array_2[i, j]:F5}");
                                 }
                             }
-                            Console.ReadKey();
+
                             break;
 
                         case 2:
                             Console.Write("Введите элементы массива A через пробел: ");
-                            string[] inputA = Console.ReadLine().Split(' ');
-                            int[] A = new int[inputA.Length];
-                            for (int i = 0; i < inputA.Length; i++)
-                            {
-                                A[i] = Convert.ToInt32(inputA[i]);
-                            }
+                            string[] inputA = Console.ReadLine().Split(' ', (char)StringSplitOptions.RemoveEmptyEntries);
+                            int[] A = Array.ConvertAll(inputA, int.Parse);
 
                             Console.Write("Введите элементы массива B через пробел: ");
-                            string[] inputB = Console.ReadLine().Split(' ');
-                            int[] B = new int[inputB.Length];
-                            for (int i = 0; i < inputB.Length; i++)
-                            {
-                                B[i] = Convert.ToInt32(inputB[i]);
-                            }
+                            string[] inputB = Console.ReadLine().Split(' ', (char)StringSplitOptions.RemoveEmptyEntries);
+                            int[] B = Array.ConvertAll(inputB, int.Parse);
 
                             Console.Write("Введите значение t: ");
                             int t = Convert.ToInt32(Console.ReadLine());
 
-                            int countA = 0;
-                            for (int i = 0; i < A.Length; i++)
-                            {
-                                if (A[i] > t)
-                                {
-                                    countA++;
-                                }
-                            }
+                            int countA = 0, countB = 0;
 
-                            int countB = 0;
-                            for (int i = 0; i < B.Length; i++)
-                            {
-                                if (B[i] > t)
-                                {
-                                    countB++;
-                                }
-                            }
+                            foreach (int a in A) if (a > t) countA++;
+                            foreach (int b in B) if (b > t) countB++;
 
                             Console.WriteLine($"\nВ массиве A элементов > {t}: {countA}");
                             Console.WriteLine($"В массиве B элементов > {t}: {countB}");
@@ -105,67 +73,107 @@ namespace lab4
                             if (countA < countB)
                             {
                                 Console.WriteLine("\nМассив A (меньшее количество элементов > t):");
-                                for (int i = 0; i < A.Length; i++)
-                                {
-                                    Console.Write(A[i] + " ");
-                                }
-
+                                Console.WriteLine(string.Join(" ", A));
                                 Console.WriteLine("\nМассив B:");
-                                for (int i = 0; i < B.Length; i++)
-                                {
-                                    Console.Write(B[i] + " ");
-                                }
+                                Console.WriteLine(string.Join(" ", B));
                             }
                             else if (countB < countA)
                             {
                                 Console.WriteLine("\nМассив B (меньшее количество элементов > t):");
-                                for (int i = 0; i < B.Length; i++)
-                                {
-                                    Console.Write(B[i] + " ");
-                                }
-
+                                Console.WriteLine(string.Join(" ", B));
                                 Console.WriteLine("\nМассив A:");
-                                for (int i = 0; i < A.Length; i++)
-                                {
-                                    Console.Write(A[i] + " ");
-                                }
+                                Console.WriteLine(string.Join(" ", A));
                             }
                             else
                             {
-                                Console.WriteLine("\nМассив A (количества равны):");
-                                for (int i = 0; i < A.Length; i++)
-                                {
-                                    Console.Write(A[i] + " ");
-                                }
-
-                                Console.WriteLine("\nМассив B:");
-                                for (int i = 0; i < B.Length; i++)
-                                {
-                                    Console.Write(B[i] + " ");
-                                }
+                                Console.WriteLine("\nКоличества равны. Оба массива:");
+                                Console.WriteLine("A: " + string.Join(" ", A));
+                                Console.WriteLine("B: " + string.Join(" ", B));
                             }
 
-                            Console.WriteLine();
-                            Console.ReadKey();
                             break;
 
                         case 3:
+                            Console.Write("Введите размерность квадратного массива n: ");
+                            int size = Convert.ToInt32(Console.ReadLine());
+
+                            int[,] matrix = new int[size, size];
+                            Random rand = new Random();
+
+                            Console.WriteLine("Матрица A(n, n):");
+                            for (int i = 0; i < size; i++)
+                            {
+                                for (int j = 0; j < size; j++)
+                                {
+                                    matrix[i, j] = rand.Next(-10, 11);
+                                    Console.Write($"{matrix[i, j],4}");
+                                }
+                                Console.WriteLine();
+                            }
+
+                            int sum = 0, count = 0;
+                            for (int i = 0; i < size; i++)
+                            {
+                                for (int j = 0; j < size; j++)
+                                {
+                                    if (matrix[i, j] >= 0)
+                                    {
+                                        sum += matrix[i, j];
+                                        count++;
+                                    }
+                                }
+                            }
+
+                            Console.WriteLine($"\nСумма всех неотрицательных элементов: {sum}");
+                            Console.WriteLine($"Количество неотрицательных элементов: {count}");
 
                             break;
-                        case 0:
-                            Console.WriteLine("Выход из программы");
+
+                        case 4:
+                            Console.Write("Введите элементы массива через пробел: ");
+                            string[] inputArr = Console.ReadLine().Split(' ', (char)StringSplitOptions.RemoveEmptyEntries);
+                            int[] arr = Array.ConvertAll(inputArr, int.Parse);
+
+                            Console.WriteLine("\nИсходный массив:");
+                            Console.WriteLine(string.Join(" ", arr));
+
+   
+                            for (int i = 0; i < arr.Length - 1; i++)
+                            {
+                                for (int j = 0; j < arr.Length - i - 1; j++)
+                                {
+                                    if (arr[j] > arr[j + 1])
+                                    {
+                                        int temp = arr[j];
+                                        arr[j] = arr[j + 1];
+                                        arr[j + 1] = temp;
+                                    }
+                                }
+                            }
+
+                            Console.WriteLine("\nОтсортированный массив (методом простого обмена):");
+                            Console.WriteLine(string.Join(" ", arr));
+
+
                             break;
+
+                        case 0:
+                            Console.WriteLine("Выход из программы...");
+                            break;
+
                         default:
-                            Console.WriteLine("Несуществующее действие, попробуйте снова");
+                            Console.WriteLine("Несуществующее действие, попробуйте снова.");
                             break;
                     }
+
                 } while (choice != 0);
             }
             catch
             {
-                Console.WriteLine("Ошибка. Введите целочисленное число");
+                Console.WriteLine("Ошибка. Введите целое число.");
                 goto startMenu;
             }
         }
     }
 }
+
