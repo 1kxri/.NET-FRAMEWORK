@@ -1,0 +1,250 @@
+using System;
+
+namespace lab4
+{
+    internal class Program
+    {
+        static void Main()
+        {
+            int choice;
+
+        startMenu:
+            try
+            {
+                do
+                {
+                    Console.WriteLine("\nВыберите номер задания 1, 2, 3, 4 или 0 для выхода:");
+                    Console.WriteLine("1 - Формирование массивов по формуле");
+                    Console.WriteLine("2 - Подсчёт элементов > t в массивах A и B");
+                    Console.WriteLine("3 - Сумма и количество неотрицательных элементов в матрице");
+                    Console.WriteLine("4 - Сортировка методом простого обмена");
+                    Console.WriteLine("0 - Выход");
+                    Console.Write("Ваш выбор: ");
+
+                    string inputChoice = Console.ReadLine();
+                    if (!int.TryParse(inputChoice, out choice))
+                    {
+                        Console.WriteLine("Ошибка: введите целое число.");
+                        continue;
+                    }
+
+                    switch (choice)
+                    {
+                        case 1:
+                            int n;
+                        startN:
+                            Console.Write("Введите n: ");
+                            if (!int.TryParse(Console.ReadLine(), out n) || n <= 0)
+                            {
+                                Console.WriteLine("Ошибка: введите целое положительное число.");
+                                goto startN;
+                            }
+
+                            double[] array_1 = new double[n];
+                            Random rnd = new Random();
+
+                            for (int i = 0; i < n; i++)
+                            {
+                                int k = rnd.Next(0, 9);
+                                array_1[i] = Math.Pow(-1, k) * (1.0 / (n * Math.Sqrt(Math.Pow(3, k))));
+                                Console.WriteLine($"array[{i}], k = {k}, {array_1[i]:F5}");
+                            }
+
+                            int m;
+                        startM:
+                            Console.Write("Введите m: ");
+                            if (!int.TryParse(Console.ReadLine(), out m) || m <= 0)
+                            {
+                                Console.WriteLine("Ошибка: введите целое положительное число.");
+                                goto startM;
+                            }
+
+                            double[,] array_2 = new double[n, m];
+
+                            for (int i = 0; i < n; i++)
+                            {
+                                for (int j = 0; j < m; j++)
+                                {
+                                    int o = rnd.Next(0, 9);
+                                    array_2[i, j] = Math.Pow(-1, o) * (1.0 / (n * Math.Sqrt(Math.Pow(3, o))));
+                                    Console.WriteLine($"array[{i}, {j}], k = {o}, {array_2[i, j]:F5}");
+                                }
+                            }
+
+                            break;
+
+                        case 2:
+                            Console.Write("Введите элементы массива A через пробел: ");
+                            string lineA = Console.ReadLine();
+
+                            if (string.IsNullOrWhiteSpace(lineA))
+                            {
+                                Console.WriteLine("Ошибка: пустой ввод массива A.");
+                                break;
+                            }
+
+                            string[] inputA = lineA.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            int[] A = new int[inputA.Length];
+                            for (int i = 0; i < inputA.Length; i++)
+                            {
+                                if (!int.TryParse(inputA[i], out A[i]))
+                                {
+                                    Console.WriteLine($"Ошибка: '{inputA[i]}' не является числом.");
+                                    goto case 2;
+                                }
+                            }
+
+                            Console.Write("Введите элементы массива B через пробел: ");
+                            string lineB = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(lineB))
+                            {
+                                Console.WriteLine("Ошибка: пустой ввод массива B.");
+                                break;
+                            }
+
+                            string[] inputB = lineB.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            int[] B = new int[inputB.Length];
+                            for (int i = 0; i < inputB.Length; i++)
+                            {
+                                if (!int.TryParse(inputB[i], out B[i]))
+                                {
+                                    Console.WriteLine($"Ошибка: '{inputB[i]}' не является числом.");
+                                    goto case 2;
+                                }
+                            }
+
+                            int t;
+                        startT:
+                            Console.Write("Введите значение t: ");
+                            if (!int.TryParse(Console.ReadLine(), out t))
+                            {
+                                Console.WriteLine("Ошибка: введите целое число.");
+                                goto startT;
+                            }
+
+                            int countA = 0, countB = 0;
+                            foreach (int a in A) if (a > t) countA++;
+                            foreach (int b in B) if (b > t) countB++;
+
+                            Console.WriteLine($"\nВ массиве A элементов > {t}: {countA}");
+                            Console.WriteLine($"В массиве B элементов > {t}: {countB}");
+
+                            if (countA < countB)
+                            {
+                                Console.WriteLine("\nМассив A (меньшее количество элементов > t):");
+                                Console.WriteLine(string.Join(" ", A));
+                            }
+                            else if (countB < countA)
+                            {
+                                Console.WriteLine("\nМассив B (меньшее количество элементов > t):");
+                                Console.WriteLine(string.Join(" ", B));
+                            }
+                            else
+                            {
+                                Console.WriteLine("\nКоличества равны. Оба массива:");
+                                Console.WriteLine("A: " + string.Join(" ", A));
+                                Console.WriteLine("B: " + string.Join(" ", B));
+                            }
+
+                            break;
+
+                        case 3:
+                            int size;
+                        startSize:
+                            Console.Write("Введите размерность квадратного массива n: ");
+                            if (!int.TryParse(Console.ReadLine(), out size) || size <= 0)
+                            {
+                                Console.WriteLine("Ошибка: введите положительное целое число.");
+                                goto startSize;
+                            }
+
+                            int[,] matrix = new int[size, size];
+                            Random rand = new Random();
+
+                            Console.WriteLine("\nМатрица A(n, n):");
+                            for (int i = 0; i < size; i++)
+                            {
+                                for (int j = 0; j < size; j++)
+                                {
+                                    matrix[i, j] = rand.Next(-10, 11);
+                                    Console.Write($"{matrix[i, j],4}");
+                                }
+                                Console.WriteLine();
+                            }
+
+                            int sum = 0, count = 0;
+                            for (int i = 0; i < size; i++)
+                            {
+                                for (int j = 0; j < size; j++)
+                                {
+                                    if (matrix[i, j] >= 0)
+                                    {
+                                        sum += matrix[i, j];
+                                        count++;
+                                    }
+                                }
+                            }
+
+                            Console.WriteLine($"\nСумма всех неотрицательных элементов: {sum}");
+                            Console.WriteLine($"Количество неотрицательных элементов: {count}");
+                            break;
+
+                        case 4:
+                            Console.Write("Введите элементы массива через пробел: ");
+                            string line = Console.ReadLine();
+                            if (string.IsNullOrWhiteSpace(line))
+                            {
+                                Console.WriteLine("Ошибка: пустой ввод массива.");
+                                break;
+                            }
+
+                            string[] inputArr = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            int[] arr = new int[inputArr.Length];
+                            for (int i = 0; i < inputArr.Length; i++)
+                            {
+                                if (!int.TryParse(inputArr[i], out arr[i]))
+                                {
+                                    Console.WriteLine($"Ошибка: '{inputArr[i]}' не является числом.");
+                                    goto case 4;
+                                }
+                            }
+
+                            Console.WriteLine("\nИсходный массив:");
+                            Console.WriteLine(string.Join(" ", arr));
+
+                            // Сортировка методом простого обмена (пузырьковая)
+                            for (int i = 0; i < arr.Length - 1; i++)
+                            {
+                                for (int j = 0; j < arr.Length - i - 1; j++)
+                                {
+                                    if (arr[j] > arr[j + 1])
+                                    {
+                                        int temp = arr[j];
+                                        arr[j] = arr[j + 1];
+                                        arr[j + 1] = temp;
+                                    }
+                                }
+                            }
+
+                            Console.WriteLine("\nОтсортированный массив (методом простого обмена):");
+                            Console.WriteLine(string.Join(" ", arr));
+                            break;
+
+                        case 0:
+                            Console.WriteLine("Выход из программы...");
+                            break;
+
+                        default:
+                            Console.WriteLine("Несуществующее действие, попробуйте снова.");
+                            break;
+                    }
+                } while (choice != 0);
+            }
+            catch
+            {
+                Console.WriteLine("Ошибка: непредвиденное исключение. Повторите ввод.");
+                goto startMenu;
+            }
+        }
+    }
+}
