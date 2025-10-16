@@ -1,0 +1,197 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace LAB_5.NET
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            int choice;
+        startMenu:
+            try
+            {
+                do
+                {
+                    Console.WriteLine("\nВыберите номер задания 1, 2, 3 или 0 для выхода:");
+                    Console.WriteLine("1 - Если в слове нечетное число символов, удвоить средний символ");
+                    Console.WriteLine("2 - Напечатать слова последовательности минимальной длины и отличных от последнего слова");
+                    Console.WriteLine("3 - Вывести клетки, находящиеся под ударом пешки на шахматной доске");
+                    Console.WriteLine("0. Выход");
+                    Console.Write("Выберите действие: ");
+
+                    choice = Convert.ToInt32(Console.ReadLine());
+
+                    switch (choice)
+                    {
+                        case 1:
+
+                        startFirst:
+                            Console.Write("Введите слово (только буквы, без пробелов): ");
+                            string word = Console.ReadLine();
+
+                            if (string.IsNullOrEmpty(word))
+                            {
+                                Console.WriteLine("Пустой ввод. Попробуйте снова.");
+                                goto startFirst;
+                            }
+
+                            if (word.Contains(" "))
+                            {
+                                Console.WriteLine("Слово не должно содержать пробелов. Попробуйте снова.");
+                                goto startFirst;
+                            }
+
+                            if (!word.All(char.IsLetter))
+                            {
+                                Console.WriteLine("Слово должно содержать только буквы. Попробуйте снова.");
+                                goto startFirst;
+                            }
+
+                            if (word.Length < 2)
+                            {
+                                Console.WriteLine("Слово слишком короткое, введите хотя бы 2 символа.");
+                                goto startFirst;
+                            }
+
+                            if (word.Length % 2 == 1)
+                            {
+                                int mid = word.Length / 2;
+                                word = word.Insert(mid + 1, word[mid].ToString());
+                                Console.WriteLine($"Результат: {word}");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Длина слова чётная, изменений не требуется.");
+                            }
+
+                            break;
+
+                        case 2:
+
+                        startSecond:
+                            Console.Write("Введите последовательность слов через пробел, закончив точкой: ");
+                            string input = Console.ReadLine()?.Trim();
+
+                            if (string.IsNullOrEmpty(input))
+                            {
+                                Console.WriteLine("Последовательность пуста, введите снова");
+                                goto startSecond;
+                            }
+                            if (!input.EndsWith("."))
+                            {
+                                Console.WriteLine("Последовательность должна заканчиваться точкой, попробуйте снова");
+                                goto startSecond;
+                            }
+
+                            string text = input.Substring(0, input.Length - 1).Trim();
+
+                            string[] words = text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+                            var validWords = new System.Collections.Generic.List<string>();
+                            var invalidWords = new System.Collections.Generic.List<string>();
+
+                            foreach (var w in words)
+                            {
+                                if (w.All(c => c >= 'a' && c <= 'z') && w.Length >= 1 && w.Length <= 8)
+                                    validWords.Add(w);
+                                else
+                                    invalidWords.Add(w);
+                            }
+
+                            if (validWords.Count < 2 || validWords.Count > 50)
+                            {
+                                Console.WriteLine("Число слов должно быть от 2 до 50");
+                                goto startSecond;
+                            }
+
+                            if (invalidWords.Count > 0)
+                            {
+                                Console.Write("Исключённые слова (длина не 1-8 или не строчные латинские): "); Console.WriteLine(string.Join(", ", invalidWords));
+                            }
+
+                            string lastWord = validWords[validWords.Count - 1];
+                            int minLen = validWords.Min(w => w.Length);
+
+                            List<string> result = new List<string>();
+
+                            for (int i = 0; i < validWords.Count; i++)
+                            {
+                                string w = validWords[i];
+                                if (w.Length == minLen && !w.Equals(lastWord))
+                                {
+                                    result.Add(w);
+                                }
+                            }
+
+                            if (result.Count == 0)
+                                Console.WriteLine("Подходящих слов нет (самое короткое слово совпадает с последним)\n");
+                            else
+                            {
+                                Console.Write("Слова минимальной длины (не равные последнему): " + string.Join(", ", result) + "\n");
+                            }
+
+                            break;
+                        case 3:
+
+                        startThird:
+                            Console.Write("Введите координату пешки (например, a2): ");
+                            string input2 = Console.ReadLine();
+
+                            if (input2.Length != 2)
+                            {
+                                Console.WriteLine("Некорректный ввод, введите снова");
+                                goto startThird;
+                            }
+
+                            char letter = input2[0];
+                            char number = input2[1];
+
+                            if (letter < 'a' || letter > 'h' || number < '1' || number > '8')
+                            {
+                                Console.WriteLine("Некорректная координата, введите снова");
+                                goto startThird;
+                            }
+
+                            int TSnumber = int.Parse(number.ToString());
+
+                            int nextTSnumber = TSnumber + 1;
+
+                            if (nextTSnumber > 8)
+                            {
+                                Console.WriteLine($"С поля {input2} пешка не может бить вперед");
+                                return;
+                            }
+
+                            string result2 = "";
+
+                            if (letter > 'a')
+                                result2 += $"{(char)(letter - 1)}{nextTSnumber}";
+                            if (letter < 'h')
+                                result2 += (result2 == "" ? "" : ", ") + $"{(char)(letter + 1)}{nextTSnumber}";
+
+                            Console.WriteLine($"С поля {input2} пешка может ударить на поле {result2}");
+
+                            break;
+                        case 0:
+                            Console.WriteLine("Выход из программы");
+                            break;
+                        default:
+                            Console.WriteLine("Несуществующее действие, попробуйте снова");
+                            break;
+                    }
+                } while (choice != 0);
+            }
+            catch
+            {
+                Console.WriteLine("Ошибка. Введите целочисленное число");
+                goto startMenu;
+            }
+        }
+    }
+}
+    
+
