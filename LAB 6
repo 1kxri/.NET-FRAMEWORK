@@ -1,0 +1,663 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace LAB_6.NET
+{
+    internal class Program
+    {
+        static int nextPlaneId = 1;
+        static void Main()
+        {
+            int choice;
+        startMenu:
+            try
+            {
+                do
+                {
+                    Console.WriteLine("\nВыберите номер задания 1, 2, 3 или 0 для выхода:");
+                    Console.WriteLine("1 - Работа с коллекцией целых чисел");
+                    Console.WriteLine("2 - Работа с коллекцией пассажирских самолётов");
+                    Console.WriteLine("3 - Работа с коллекцией пассажирских самолётов с iD ключом");
+                    Console.WriteLine("0. Выход");
+                    Console.Write("Выберите действие: ");
+
+                    choice = Convert.ToInt32(Console.ReadLine());
+
+                    switch (choice)
+                    {
+                        case 1:
+                            {
+                                List<int> numbers = new List<int>();
+                                int choice_1;
+                            Fmenu:
+                                try
+                                {
+                                    do
+                                    {
+                                        Console.WriteLine("\nВыберите действие:");
+                                        Console.WriteLine("1. Добавить число");
+                                        Console.WriteLine("2. Удалить число");
+                                        Console.WriteLine("3. Найти число");
+                                        Console.WriteLine("4. Отсортировать коллекцию");
+                                        Console.WriteLine("5. Вывести коллекцию");
+                                        Console.WriteLine("0. Назад в главное меню");
+                                        Console.Write("Ваш выбор: ");
+                                        choice_1 = Convert.ToInt32(Console.ReadLine());
+                                        switch (choice_1)
+                                        {
+                                            case 1:
+                                                AddNum(numbers);
+                                                break;
+                                            case 2:
+                                                DelNum(numbers);
+                                                break;
+                                            case 3:
+                                                SearchNum(numbers);
+                                                break;
+                                            case 4:
+                                                SortNum(numbers);
+                                                break;
+                                            case 5:
+                                                ShowNum(numbers);
+                                                break;
+                                            case 0:
+                                                Console.WriteLine("Возврат в главное меню");
+                                                break;
+                                            default:
+                                                Console.WriteLine("Несуществующее действие, попробуйте снова");
+                                                break;
+                                        }
+                                    } while (choice_1 != 0);
+                                }
+                                catch
+                                {
+                                    Console.WriteLine("Ошибка. Введите целое число");
+                                    goto Fmenu;
+                                }
+                            }
+
+                            void AddNum(List<int> numbers_1)
+                            {
+                                Console.Write("Введите числа через пробел: ");
+                                string input_1 = Console.ReadLine();
+
+                                if (string.IsNullOrWhiteSpace(input_1))
+                                {
+                                    Console.WriteLine("Пустой ввод");
+                                    return;
+                                }
+
+                                string[] numberStrings_1 = input_1.Split(' ');
+                                List<int> addedNumbers_1 = new List<int>();
+                                List<string> invalidInputs_1 = new List<string>();
+                                List<int> duplicateNumbers_1 = new List<int>();
+
+                                foreach (string numberStr in numberStrings_1)
+                                {
+                                    if (string.IsNullOrWhiteSpace(numberStr))
+                                        continue;
+
+                                    if (int.TryParse(numberStr, out int num))
+                                    {
+                                        if (numbers_1.Contains(num))
+                                        {
+                                            duplicateNumbers_1.Add(num);
+                                        }
+                                        else
+                                        {
+                                            numbers_1.Add(num);
+                                            addedNumbers_1.Add(num);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        invalidInputs_1.Add(numberStr);
+                                    }
+                                }
+
+                                if (addedNumbers_1.Count > 0)
+                                {
+                                    string numbersText = string.Join(", ", addedNumbers_1);
+                                    Console.WriteLine($"Числа {numbersText} добавлены в коллекцию");
+                                }
+
+                                if (duplicateNumbers_1.Count > 0)
+                                {
+                                    string duplicateText = string.Join(", ", duplicateNumbers_1);
+                                    Console.WriteLine($"Числа {duplicateText} уже есть в коллекции - пропуск");
+                                }
+
+                                if (invalidInputs_1.Count > 0)
+                                {
+                                    string invalidText = string.Join(", ", invalidInputs_1);
+                                    Console.WriteLine($"Некорректный ввод: {invalidText} - пропуск");
+                                }
+
+                                if (addedNumbers_1.Count == 0 && duplicateNumbers_1.Count == 0 && invalidInputs_1.Count == 0)
+                                {
+                                    Console.WriteLine("Не удалось добавить ни одного числа");
+                                }
+                            }
+
+                            void DelNum(List<int> numbers_1)
+                            {
+                                Console.Write("Введите числа для удаления через пробел: ");
+                                string input_1 = Console.ReadLine();
+
+                                if (string.IsNullOrWhiteSpace(input_1))
+                                {
+                                    Console.WriteLine("Пустой ввод");
+                                }
+
+                                string[] numberStrings_1 = input_1.Split(' ');
+                                List<int> removedNumbers_1 = new List<int>();
+                                List<int> notFoundNumbers_1 = new List<int>();
+                                List<string> invalidInputs_1 = new List<string>();
+
+                                foreach (string numberStr_1 in numberStrings_1)
+                                {
+                                    if (string.IsNullOrWhiteSpace(numberStr_1))
+                                        continue;
+
+                                    if (int.TryParse(numberStr_1, out int num))
+                                    {
+                                        if (numbers_1.Remove(num))
+                                            removedNumbers_1.Add(num);
+                                        else
+                                            notFoundNumbers_1.Add(num);
+                                    }
+                                    else
+                                    {
+                                        invalidInputs_1.Add(numberStr_1);
+                                    }
+                                }
+
+                                if (removedNumbers_1.Count > 0)
+                                {
+                                    string removedText = string.Join(", ", removedNumbers_1);
+                                    Console.WriteLine($"Числа {removedText} удалены из коллекции");
+                                }
+
+                                if (notFoundNumbers_1.Count > 0)
+                                {
+                                    string notFoundText_1 = string.Join(", ", notFoundNumbers_1);
+                                    Console.WriteLine($"Числа {notFoundText_1} не найдены в коллекции");
+                                }
+
+                                if (invalidInputs_1.Count > 0)
+                                {
+                                    string invalidText = string.Join(", ", invalidInputs_1);
+                                    Console.WriteLine($"Некорректный ввод: {invalidText} - пропускаем");
+                                }
+
+                                if (removedNumbers_1.Count == 0 && notFoundNumbers_1.Count == 0 && invalidInputs_1.Count > 0)
+                                {
+                                    Console.WriteLine("Не удалось обработать ни одного числа");
+                                }
+                            }
+
+                            void SearchNum(List<int> numbers_1)
+                            {
+                                Console.Write("Введите числа через пробел для поиска: ");
+                                string input = Console.ReadLine();
+                                string[] parts = input.Split(' ');
+                                List<int> notFound = new List<int>();
+                                List<int> found = new List<int>();
+
+                                foreach (var part in parts)
+                                {
+                                    if (int.TryParse(part, out int num))
+                                    {
+                                        if (numbers_1.Contains(num))
+                                            found.Add(num);
+                                        else
+                                            notFound.Add(num);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"Некорректный ввод: {part} - пропускаем");
+                                    }
+                                }
+
+                                if (found.Count > 0)
+                                    Console.WriteLine("Найдено: " + string.Join(", ", found));
+                                if (notFound.Count > 0)
+                                    Console.WriteLine("Не найдено: " + string.Join(", ", notFound));
+                            }
+
+                            void SortNum(List<int> numbers_1)
+                            {
+                                numbers_1.Sort();
+                                Console.WriteLine("Коллекция отсортирована(в порядке увеличения)");
+                            }
+
+                            void ShowNum(List<int> numbers_1)
+                            {
+                                if (numbers_1.Count == 0)
+                                    Console.WriteLine("Коллекция пуста");
+                                else
+                                    Console.WriteLine("Коллекция целых чисел: " + string.Join(", ", numbers_1));
+                            }
+                            break;
+                        case 2:
+                            {
+                                List<PassengerPlane> planes_2 = new List<PassengerPlane>();
+                                int choice_2;
+                            Smenu:
+                                try
+                                {
+                                    do
+                                    {
+                                        Console.WriteLine("\nВыберите действие:");
+                                        Console.WriteLine("1. Добавить самолёт");
+                                        Console.WriteLine("2. Удалить самолёт по модели");
+                                        Console.WriteLine("3. Найти самолёт по авиакомпании");
+                                        Console.WriteLine("4. Отсортировать по году выпуска");
+                                        Console.WriteLine("5. Вывести все самолёты");
+                                        Console.WriteLine("0. Назад в главное меню");
+                                        Console.Write("Ваш выбор: ");
+                                        choice_2 = Convert.ToInt32(Console.ReadLine());
+
+                                        switch (choice_2)
+                                        {
+                                            case 1:
+                                                AddPlane(planes_2);
+                                                break;
+                                            case 2:
+                                                DelPlane(planes_2);
+                                                break;
+                                            case 3:
+                                                SearchPlane(planes_2);
+                                                break;
+                                            case 4:
+                                                SortPlanes(planes_2);
+                                                break;
+                                            case 5:
+                                                ShowPlanes(planes_2);
+                                                break;
+                                            case 0:
+                                                Console.WriteLine("Возврат в главное меню");
+                                                break;
+                                            default:
+                                                Console.WriteLine("Несуществующее действие");
+                                                break;
+                                        }
+                                    } while (choice_2 != 0);
+                                }
+                                catch
+                                {
+                                    Console.WriteLine("Ошибка. Введите целое число");
+                                    goto Smenu;
+                                }
+                            }
+
+                            void AddPlane(List<PassengerPlane> planes_2)
+                            {
+                                Console.Write("Введите авиакомпанию: ");
+                                string airline_2 = Console.ReadLine();
+
+                                Console.Write("Введите модель самолёта: ");
+                                string model_2 = Console.ReadLine();
+
+
+                                int year_2, seats_2;
+
+                                do
+                                {
+                                    Console.Write("Введите год выпуска: ");
+                                    if (!int.TryParse(Console.ReadLine(), out year_2) || year_2 < 1900 || year_2 > DateTime.Now.Year)
+                                    {
+                                        Console.WriteLine("Некорректный год выпуска, попробуйте снова");
+                                    }
+                                } while (year_2 < 1900 || year_2 > DateTime.Now.Year);
+
+                                do
+                                {
+                                    Console.Write("Введите количество мест: ");
+                                    if (!int.TryParse(Console.ReadLine(), out seats_2) || seats_2 < 1)
+                                    {
+                                        Console.WriteLine("Количество мест не может быть меньше 1, попробуйте снова");
+                                    }
+                                } while (seats_2 < 1);
+
+                                planes_2.Add(new PassengerPlane(airline_2, model_2, year_2, seats_2));
+                                Console.WriteLine("Самолёт успешно добавлен");
+                            }
+
+                            void DelPlane(List<PassengerPlane> planes_2)
+                            {
+                                Console.Write("Введите модель самолёта для удаления: ");
+                                string model_2 = Console.ReadLine();
+
+                                var removed = planes_2.RemoveAll(p => p.Model.Equals(model_2, StringComparison.OrdinalIgnoreCase));
+                                if (removed > 0)
+                                    Console.WriteLine($"Удалено самолётов: {removed}");
+                                else
+                                    Console.WriteLine("Самолёты с такой моделью не найдены");
+                            }
+
+                            void SearchPlane(List<PassengerPlane> planes_2)
+                            {
+                                Console.Write("Введите авиакомпанию для поиска: ");
+                                string airline_2 = Console.ReadLine();
+
+                                var found = planes_2.FindAll(p => p.AirlineName.Equals(airline_2, StringComparison.OrdinalIgnoreCase));
+                                if (found.Count == 0)
+                                    Console.WriteLine("Самолёты не найдены");
+                                else
+                                {
+                                    Console.WriteLine($"Найдено {found.Count} самолётов:");
+                                    foreach (var p in found)
+                                    {
+                                        Console.WriteLine("-----------");
+                                        p.ShowInfo();
+                                    }
+                                }
+                            }
+
+                            void SortPlanes(List<PassengerPlane> planes_2)
+                            {
+                                if (planes_2.Count == 0)
+                                {
+                                    Console.WriteLine("Коллекция пуста");
+                                    return;
+                                }
+
+                                Console.WriteLine("\nВыберите способ сортировки:");
+                                Console.WriteLine("1. По количеству мест");
+                                Console.WriteLine("2. По году выпуска");
+                                Console.Write("Ваш выбор: ");
+
+                                string input_2 = Console.ReadLine();
+
+                                switch (input_2)
+                                {
+                                    case "1":
+                                        planes_2.Sort((a, b) => a.Seats.CompareTo(b.Seats));
+                                        Console.WriteLine("Коллекция отсортирована по количеству мест");
+                                        break;
+
+                                    case "2":
+                                        planes_2.Sort((a, b) => a.Year.CompareTo(b.Year));
+                                        Console.WriteLine("Коллекция отсортирована по году выпуска");
+                                        break;
+
+                                    default:
+                                        Console.WriteLine("Некорректный выбор, сортировка не выполнена");
+                                        break;
+                                }
+                            }
+
+                            void ShowPlanes(List<PassengerPlane> planes_2)
+                            {
+                                if (planes_2.Count == 0)
+                                {
+                                    Console.WriteLine("Коллекция пуста");
+                                    return;
+                                }
+
+                                Console.WriteLine("\nСписок самолётов");
+                                GORline(62);
+                                Console.WriteLine("| {0,-20} | {1,-20} | {2,-6} | {3,-5} |", "Авиакомпания", "Модель", "Год", "Мест");
+                                GORline(62);
+                                foreach (var p in planes_2)
+                                {
+                                    Console.WriteLine("| {0,-20} | {1,-20} | {2,-6} | {3,-5} |",
+                                                      p.AirlineName, p.Model, p.Year, p.Seats);
+                                }
+                                GORline(62);
+                            }
+                            break;
+                        case 3:
+                            {
+                                SortedList planes_3 = new SortedList();
+                                int choice_3;
+
+                            Menu:
+                                try
+                                {
+                                    do
+                                    {
+                                        Console.WriteLine("\nВыберите действие:");
+                                        Console.WriteLine("1. Добавить самолёт");
+                                        Console.WriteLine("2. Удалить самолёт по iD");
+                                        Console.WriteLine("3. Найти самолёт по iD");
+                                        Console.WriteLine("4. Вывести все самолёты");
+                                        Console.WriteLine("0. Назад в главное меню");
+                                        Console.Write("Ваш выбор: ");
+                                        choice_3 = Convert.ToInt32(Console.ReadLine());
+
+                                        switch (choice_3)
+                                        {
+                                            case 1:
+                                                AddPlaneToSortedList(planes_3);
+                                                break;
+                                            case 2:
+                                                RemovePlaneFromSortedList(planes_3);
+                                                break;
+                                            case 3:
+                                                SearchPlaneInSortedList(planes_3);
+                                                break;
+                                            case 4:
+                                                ShowSortedListPlanes(planes_3);
+                                                break;
+                                            case 0:
+                                                Console.WriteLine("Возврат в главное меню");
+                                                break;
+                                            default:
+                                                Console.WriteLine("Несуществующее действие");
+                                                break;
+                                        }
+
+                                    } while (choice_3 != 0);
+                                }
+                                catch
+                                {
+                                    Console.WriteLine("Ошибка. Введите целое число");
+                                    goto Menu;
+                                }
+                            }
+
+                            void AddPlaneToSortedList(SortedList planes_3)
+                            {
+                                Console.Write("Введите авиакомпанию: ");
+                                string airline_3 = Console.ReadLine();
+                                Console.Write("Введите модель самолёта: ");
+                                string model_3 = Console.ReadLine();
+
+                                int year_3;
+                                do
+                                {
+                                    Console.Write("Введите год выпуска: ");
+                                    if (!int.TryParse(Console.ReadLine(), out year_3) || year_3 < 1900 || year_3 > DateTime.Now.Year)
+                                    {
+                                        Console.WriteLine("Некорректный год выпуска, попробуйте снова");
+                                    }
+                                } while (year_3 < 1900 || year_3 > DateTime.Now.Year);
+
+                                int seats_3;
+                                do
+                                {
+                                    Console.Write("Введите количество мест: ");
+                                    if (!int.TryParse(Console.ReadLine(), out seats_3) || seats_3 < 1)
+                                    {
+                                        Console.WriteLine("Количество мест не может быть меньше 1, попробуйте снова");
+                                    }
+                                } while (seats_3 < 1);
+
+                                int id = nextPlaneId++;
+
+                                planes_3.Add(id, new PassengerPlane(airline_3, model_3, year_3, seats_3));
+                                Console.WriteLine($"Самолёт добавлен в SortedList c iD: {id}");
+                            }
+
+                            void RemovePlaneFromSortedList(SortedList planes_3)
+                            {
+                            S1:
+                                Console.Write("Введите iD самолёта для удаления: ");
+                                if (int.TryParse(Console.ReadLine(), out int id))
+                                {
+                                    if (planes_3.ContainsKey(id))
+                                    {
+                                        planes_3.Remove(id);
+                                        Console.WriteLine("Самолёт удалён");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Самолёт с таким iD не найден");
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Некорректный ввод iD, попробуйте снова");
+                                    goto S1;
+                                }
+                            }
+
+                            void SearchPlaneInSortedList(SortedList planes_3)
+                            {
+                            S2:
+                                Console.Write("Введите iD самолёта для поиска: ");
+                                if (int.TryParse(Console.ReadLine(), out int id))
+                                {
+                                    if (planes_3.ContainsKey(id))
+                                    {
+                                        PassengerPlane p = (PassengerPlane)planes_3[id];
+                                        Console.WriteLine("Самолёт найден:");
+                                        p.ShowInfo();
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Самолёт с таким iD не найден");
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Некорректный ввод iD, попробуйте снова");
+                                    goto S2;
+                                }
+                            }
+
+                            void ShowSortedListPlanes(SortedList planes_3)
+                            {
+                                if (planes_3.Count == 0)
+                                {
+                                    Console.WriteLine("Коллекция пуста");
+                                    return;
+                                }
+
+                                Console.WriteLine("\nСписок самолётов");
+                                GORline(69);
+                                Console.WriteLine("| {0,-4} | {1,-20} | {2,-20} | {3,-6} | {4,-5} |", "iD", "Авиакомпания", "Модель", "Год", "Мест");
+                                GORline(69);
+
+                                foreach (DictionaryEntry entry in planes_3)
+                                {
+                                    int id = (int)entry.Key;
+                                    PassengerPlane p = (PassengerPlane)entry.Value;
+                                    Console.WriteLine("| {0,-4} | {1,-20} | {2,-20} | {3,-6} | {4,-5} |",
+                                                      id, p.AirlineName, p.Model, p.Year, p.Seats);
+                                }
+
+                                GORline(69);
+                            }
+                            void GORline(int f_size)
+                            {
+                                Console.Write("x");
+                                for (int i = 0; i < f_size; i++)
+                                {
+                                    Console.Write("-");
+                                }
+                                Console.Write("x\n");
+                            }
+
+                            break;
+                        case 0:
+                            Console.WriteLine("Выход из программы");
+                            break;
+                        default:
+                            Console.WriteLine("Несуществующее действие, попробуйте снова");
+                            break;
+                    }
+                } while (choice != 0);
+            }
+            catch
+            {
+                Console.WriteLine("Ошибка. Введите целое число");
+                goto startMenu;
+            }
+        }
+        public class PassengerPlane
+        {
+            private string _airlineName; // Авиакомпания
+            private string _model;       // Модель самолёта
+            private int _year;           // Год выпуска
+            private int _seats;          // Количество мест
+
+            public string AirlineName
+            {
+                get { return _airlineName; }
+                set
+                {
+                    if (string.IsNullOrWhiteSpace(value))
+                        throw new ArgumentException("Авиакомпания не может быть пустой");
+                    _airlineName = value;
+                }
+            }
+
+            public string Model
+            {
+                get { return _model; }
+                set
+                {
+                    if (string.IsNullOrWhiteSpace(value))
+                        throw new ArgumentException("Модель не может быть пустой");
+                    _model = value;
+                }
+            }
+
+            public int Year
+            {
+                get { return _year; }
+                set
+                {
+                    if (value < 1900 || value > DateTime.Now.Year)
+                        throw new ArgumentException("Некорректный год выпуска");
+                    _year = value;
+                }
+            }
+
+            public int Seats
+            {
+                get { return _seats; }
+                set
+                {
+                    if (value < 1)
+                        throw new ArgumentException("Количество мест не может быть меньше 1");
+                    _seats = value;
+                }
+            }
+
+            public PassengerPlane(string airlineName, string model, int year, int seats)
+            {
+                AirlineName = airlineName;
+                Model = model;
+                Year = year;
+                Seats = seats;
+            }
+
+            public void ShowInfo()
+            {
+                Console.WriteLine($"Авиакомпания: {AirlineName}");
+                Console.WriteLine($"Модель: {Model}");
+                Console.WriteLine($"Год выпуска: {Year}");
+                Console.WriteLine($"Количество мест: {Seats}");
+            }
+        }
+    }
+}
+
