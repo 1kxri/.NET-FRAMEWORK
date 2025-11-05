@@ -1,0 +1,404 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace LAB_7.NET
+{
+    internal class Program
+    {
+        static Random randomGenerator = new Random();
+        static void Main(string[] args)
+        {
+            int userChoice;
+        menuStart:
+            try
+            {
+                do
+                {
+                    Console.WriteLine("\nВыберите задание 1-4 или 0 для выхода:");
+                    Console.WriteLine("(1) Задание 1.1 - Посчитать кол-во строк двумерного массива, в которых есть максимальный по модулю элемент");
+                    Console.WriteLine("(2) Задание 1.2 - Даны x, y, z. Вычислить значения a, b по формулам из первой л.р.");
+                    Console.WriteLine("(3) Задание 1.3 - Нахождение количества нулей одномерного массива");
+                    Console.WriteLine("(4) Задание 2 - Вычисение u, v, k процедурами с применением ссылочных параметров с модификаторами ref, out, in");
+                    Console.WriteLine("(5) Задание 3 - Нахождение максимальной нечетной цифры в четырёхзначном числе");
+                    Console.WriteLine("(6) Задание 4 - Нахождение площади треугольника по координатам 3-х точек");
+                    Console.WriteLine("0. Выход");
+                    Console.Write("Выберите действие: ");
+
+                    userChoice = Convert.ToInt32(Console.ReadLine());
+
+                    switch (userChoice)
+                    {
+                        case 1:
+                            int rowsCount;
+                        inputRows:
+                            Console.Write("Введите количество строк n для одномерного массива: ");
+                            if (!int.TryParse(Console.ReadLine(), out rowsCount) || rowsCount <= 0)
+                            {
+                                Console.WriteLine("Ошибка. n должно быть целым числом и больше 0");
+                                goto inputRows;
+                            }
+
+                            int columnsCount;
+                        inputColumns:
+                            Console.Write("Введите количество столбцов m для двумерного массива: ");
+                            if (!int.TryParse(Console.ReadLine(), out columnsCount) || columnsCount <= 0)
+                            {
+                                Console.WriteLine("Ошибка. m должно быть целым числом и больше 0");
+                                goto inputColumns;
+                            }
+
+                            double[,] matrixA = new double[rowsCount, columnsCount];
+
+                            int fillChoice1;
+                            while (true)
+                            {
+                                Console.Write("(1) Ввести массив вручную; (2) Заполнить массив случайными числами (от -99 до 99): ");
+                                if (int.TryParse(Console.ReadLine(), out fillChoice1) && (fillChoice1 == 1 || fillChoice1 == 2))
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Несуществующий выбор, введите 1 или 2\n");
+                                }
+                            }
+
+                            FillMatrix2D(matrixA, "A", fillChoice1);
+
+                            Console.WriteLine("\nМассив A:");
+                            for (int i = 0; i < rowsCount; i++)
+                            {
+                                for (int j = 0; j < columnsCount; j++)
+                                    Console.Write($"{matrixA[i, j],4}");
+                                Console.WriteLine();
+                            }
+
+                            double maxAbsolute = Math.Abs(matrixA[0, 0]);
+                            for (int i = 0; i < rowsCount; i++)
+                                for (int j = 0; j < columnsCount; j++)
+                                    if (Math.Abs(matrixA[i, j]) > maxAbsolute)
+                                        maxAbsolute = Math.Abs(matrixA[i, j]);
+
+                            int rowsWithMaxCount = 0;
+                            for (int i = 0; i < rowsCount; i++)
+                            {
+                                for (int j = 0; j < columnsCount; j++)
+                                {
+                                    if (Math.Abs(matrixA[i, j]) == maxAbsolute)
+                                    {
+                                        rowsWithMaxCount++;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            Console.WriteLine($"\nМаксимальные по модулю элементы: {maxAbsolute}, {(-1) * maxAbsolute}");
+                            Console.WriteLine($"Количество строк, содержащих максимальный по модулю элемент массива: {rowsWithMaxCount}");
+                            break;
+                        case 2:
+                        inputX:
+                            double inputX, inputY, inputZ, resultA, resultB, denominator;
+                            Console.Write("Введите x: ");
+                            if (!double.TryParse(Console.ReadLine(), out inputX) || Math.Abs(inputX) == 0)
+                            {
+                                Console.WriteLine("Ошибка. x должен быть числом, отличным от 0 (Знаменатель в фурмулах a, b не может быть равным 0)");
+                                goto inputX;
+                            }
+                        inputY:
+                            Console.Write("Введите y: ");
+                            if (!double.TryParse(Console.ReadLine(), out inputY))
+                            {
+                                Console.WriteLine("Ошибка. y должен быть числом");
+                                goto inputY;
+                            }
+                        inputZ:
+                            Console.Write("Введите z: ");
+                            if (!double.TryParse(Console.ReadLine(), out inputZ))
+                            {
+                                Console.WriteLine("Ошибка. z должен быть числом");
+                                goto inputZ;
+                            }
+
+                            denominator = inputZ + Math.Pow(inputX, 2) / 4;
+
+                            if (Math.Abs(denominator) == 0)
+                            {
+                                Console.WriteLine("Ошибка. Знаменатель в выражении a равен нулю (z + (x^2)/4 = 0)");
+                                goto inputX;
+                            }
+
+                            double logArgument = Math.Abs((inputY - Math.Sqrt(Math.Abs(inputX))) * (inputX - inputY / denominator));
+
+                            if (logArgument <= 0)
+                            {
+                                Console.WriteLine("Ошибка. Подлогарифмическое выражение <= 0, попробуйте снова");
+                                goto inputX;
+                            }
+
+                            resultA = Math.Log(logArgument);
+                            Console.WriteLine($"a = {resultA}");
+
+                            resultB = inputX - Math.Pow(inputX, 2) / 3 + (inputX + inputY) / inputX;
+                            Console.WriteLine($"b = {resultB}");
+                            break;
+                        case 3:
+                            int arraySize;
+                        inputSize:
+                            Console.Write("Введите количество элементов k для одномерного массива: ");
+                            if (!int.TryParse(Console.ReadLine(), out arraySize) || arraySize <= 0)
+                            {
+                                Console.WriteLine("Ошибка. k должно быть целым числом и больше 0");
+                                goto inputSize;
+                            }
+
+                            double[] arrayB = new double[arraySize];
+
+                            int fillChoice2;
+                            while (true)
+                            {
+                                Console.Write("(1) Ввести массив вручную; (2) Заполнить массив случайными числами (от -99 до 99): ");
+                                if (int.TryParse(Console.ReadLine(), out fillChoice2) && (fillChoice2 == 1 || fillChoice2 == 2))
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Несуществующий выбор, введите 1 или 2\n");
+                                }
+                            }
+
+                            FillArray1D(arrayB, "B", fillChoice2);
+
+                            Console.WriteLine("\nМассив B: " + string.Join(", ", arrayB));
+
+                            int zeroCount = 0;
+
+                            foreach (var element in arrayB)
+                            {
+                                if (Math.Abs(element) < 1e-9)
+                                    zeroCount++;
+                            }
+
+                            Console.WriteLine("Количество нулей в массиве: " + zeroCount);
+                            break;
+                        case 4:
+                            double paramA, paramB;
+                        inputParamA:
+                            Console.Write("Введите a: ");
+                            if (!double.TryParse(Console.ReadLine(), out paramA))
+                            {
+                                Console.WriteLine("Ошибка: a должно быть числом");
+                                goto inputParamA;
+                            }
+                        inputParamB:
+                            Console.Write("Введите b: ");
+                            if (!double.TryParse(Console.ReadLine(), out paramB))
+                            {
+                                Console.WriteLine("Ошибка: b должно быть числом");
+                                goto inputParamB;
+                            }
+
+                            CalculateU(in paramA, in paramB, out double resultU);
+                            CalculateV(in paramA, in paramB, out double resultV);
+                            CalculateK(ref resultU, ref resultV, out double resultK);
+
+                            Console.WriteLine($"\nРезультаты вычислений:");
+                            Console.WriteLine($"u = {resultU:F3}");
+                            Console.WriteLine($"v = {resultV:F3}");
+                            Console.WriteLine($"k = {resultK:F3}");
+                            break;
+                        case 5:
+                            int inputNumber;
+                        inputNumberStart:
+                            Console.Write("Введите четырёхзначное число: ");
+                            if (!int.TryParse(Console.ReadLine(), out inputNumber) || inputNumber < 1000 || inputNumber > 9999)
+                            {
+                                Console.WriteLine("Ошибка. Нужно ввести целое четырёхзначное число");
+                                goto inputNumberStart;
+                            }
+
+                            FindMaxOddDigit(in inputNumber, out int maxOddDigit);
+
+                            if (maxOddDigit == -1)
+                                Console.WriteLine($"Максимальная нечётная цифра: {maxOddDigit} (не найдено)");
+                            else
+                                Console.WriteLine($"Максимальная нечётная цифра: {maxOddDigit}");
+                            break;
+                        case 6:
+                            double coordX1, coordY1, coordX2, coordY2, coordX3, coordY3;
+
+                            Console.WriteLine("Введите координаты точек в формате: 'x y' (через пробел)");
+
+                            ReadPointCoordinates("A", 0, 0, out coordX1, out coordY1);
+                            ReadPointCoordinates("B", 2, 0, out coordX2, out coordY2);
+                            ReadPointCoordinates("C", 1, 2, out coordX3, out coordY3);
+
+                            double trianglePerimeter = CalculatePerimeter(coordX1, coordY1, coordX2, coordY2, coordX3, coordY3);
+                            double semiPerimeter = trianglePerimeter / 2;
+
+                            double sideAB, sideBC, sideAC;
+                            CalculateDistance(in coordX1, in coordY1, in coordX2, in coordY2, out sideAB);
+                            CalculateDistance(in coordX2, in coordY2, in coordX3, in coordY3, out sideBC);
+                            CalculateDistance(in coordX1, in coordY1, in coordX3, in coordY3, out sideAC);
+
+                            double triangleArea = Math.Sqrt(semiPerimeter * (semiPerimeter - sideAB) * (semiPerimeter - sideBC) * (semiPerimeter - sideAC));
+
+                            Console.WriteLine($"\nДлина сторон треугольника:\nAB = {sideAB:F3}\nBC = {sideBC:F3}\nAC = {sideAC:F3}");
+                            Console.WriteLine($"Периметр треугольника: {trianglePerimeter:F3}");
+                            Console.WriteLine($"Площадь треугольника: {triangleArea:F3}");
+                            break;
+                        case 0:
+                            Console.WriteLine("Выход из программы");
+                            break;
+                        default:
+                            Console.WriteLine("Несуществующее действие, попробуйте снова");
+                            break;
+                    }
+                } while (userChoice != 0);
+            }
+            catch
+            {
+                Console.WriteLine("Ошибка. Введите целочисленное число");
+                goto menuStart;
+            }
+        }
+
+
+        static void CalculateU(in double a, in double b, out double u)
+        {
+            u = Math.Max(a, b - a);
+        }
+        static void CalculateV(in double a, in double b, out double v)
+        {
+            v = Math.Min(a * b, a + b);
+        }
+        static void CalculateK(ref double u, ref double v, out double k)
+        {
+            k = Math.Min(u + v * 2, 3.14);
+        }
+
+        static void FindMaxOddDigit(in int number, out int maxOdd)
+        {
+            maxOdd = -1;
+
+            int tempNumber = number;
+
+            while (tempNumber > 0)
+            {
+                int currentDigit = tempNumber % 10;
+                if (currentDigit % 2 != 0 && currentDigit > maxOdd)
+                {
+                    maxOdd = currentDigit;
+                }
+                tempNumber /= 10;
+            }
+        }
+
+
+        static void ReadPointCoordinates(string pointName, double defaultX, double defaultY, out double x, out double y)
+        {
+        StartCoordinateInput:
+            Console.Write($"Введите координаты точки {pointName}: ");
+            string userInput = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(userInput))
+            {
+                x = defaultX;
+                y = defaultY;
+                return;
+            }
+
+            var inputParts = userInput.Split(' ');
+            inputParts = inputParts.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
+
+            if (inputParts.Length != 2)
+            {
+                Console.WriteLine("Ошибка. Нужно ввести ДВА числа");
+                goto StartCoordinateInput;
+            }
+
+            if (!double.TryParse(inputParts[0], out x) || !double.TryParse(inputParts[1], out y))
+            {
+                Console.WriteLine("Ошибка. Координаты должны быть числами");
+                goto StartCoordinateInput;
+            }
+        }
+
+        static void CalculateDistance(in double x1, in double y1, in double x2, in double y2, out double distance)
+        {
+            distance = Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
+        }
+
+        static double CalculatePerimeter(
+            double x1 = 0, double y1 = 0,
+            double x2 = 2, double y2 = 0,
+            double x3 = 1, double y3 = 2)
+        {
+            double sideAB, sideBC, sideAC;
+
+            CalculateDistance(in x1, in y1, in x2, in y2, out sideAB);
+            CalculateDistance(in x2, in y2, in x3, in y3, out sideBC);
+            CalculateDistance(in x1, in y1, in x3, in y3, out sideAC);
+
+            return sideAB + sideBC + sideAC;
+        }
+
+        static void FillArray1D(double[] array, string arrayName, int fillChoice)
+        {
+            if (fillChoice == 1)
+            {
+                Console.WriteLine($"Введите {array.Length} элементов массива {arrayName}:");
+                for (int i = 0; i < array.Length; i++)
+                {
+                    while (true)
+                    {
+                        Console.Write($"{arrayName}[{i}] = ");
+                        if (double.TryParse(Console.ReadLine(), out array[i]))
+                            break;
+                        Console.WriteLine("Ошибка. Введите число");
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < array.Length; i++)
+                    array[i] = randomGenerator.Next(-99, 100);
+                Console.WriteLine($"Массив {arrayName} заполнен случайными числами(От -99 до 99)");
+            }
+        }
+
+        static void FillMatrix2D(double[,] matrix, string matrixName, int fillChoice)
+        {
+            if (fillChoice == 1)
+            {
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < matrix.GetLength(1); j++)
+                    {
+                        while (true)
+                        {
+                            Console.Write($"{matrixName}[{i},{j}] = ");
+                            if (double.TryParse(Console.ReadLine(), out matrix[i, j]))
+                                break;
+                            Console.WriteLine("Ошибка. Введите число");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < matrix.GetLength(1); j++)
+                    {
+                        matrix[i, j] = randomGenerator.Next(-99, 100);
+                    }
+                }
+                Console.WriteLine($"Массив {matrixName} заполнен случайными числами(От -99 до 99)");
+            }
+        }
+    }
+}
