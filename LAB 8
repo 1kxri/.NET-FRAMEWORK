@@ -1,0 +1,340 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+
+namespace LAB_8.NET
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            int choice;
+        startMenu:
+            try
+            {
+                do
+                {
+                    Console.WriteLine("\nВыберите задание 1-4 или 0 для выхода:");
+                    Console.WriteLine("1 - Задание 1 (Работа с файлом целых чисел)");
+                    Console.WriteLine("2 - Задание 2 (Создание папки)");
+                    Console.WriteLine("3 - Задание 3 (Создание текстового файла)");
+                    Console.WriteLine("4 - Задание 4 (Чтение из файла)");
+                    Console.WriteLine("0 - Выход");
+                    Console.Write("Выберите действие: ");
+
+                    choice = Convert.ToInt32(Console.ReadLine());
+
+                    switch (choice)
+                    {
+                        case 1:
+                            ProcessIntegerFile();
+                            break;
+                        case 2:
+                            CreateDirectory();
+                            break;
+                        case 3:
+                            CreateTextFile();
+                            break;
+                        case 4:
+                            ReadFromFile();
+                            break;
+                        case 0:
+                            Console.WriteLine("Выход из программы");
+                            break;
+                        default:
+                            Console.WriteLine("Несуществующее действие, попробуйте снова");
+                            break;
+                    }
+                } while (choice != 0);
+            }
+            catch
+            {
+                Console.WriteLine("Ошибка. Введите целое число");
+                goto startMenu;
+            }
+        }
+
+        static void ProcessIntegerFile()
+        {
+            // Автоматическое создание пути к файлу
+            string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "numbers.txt");
+            Console.WriteLine($"Файл будет создан: {filePath}");
+
+            try
+            {
+                // Создание и заполнение файла случайными числами
+                Random rand = new Random();
+                List<int> numbers = new List<int>();
+
+                Console.Write("Введите количество чисел для генерации: ");
+                if (!int.TryParse(Console.ReadLine(), out int count) || count <= 0)
+                {
+                    Console.WriteLine("Ошибка: введите целое положительное число");
+                    return;
+                }
+
+                for (int i = 0; i < count; i++)
+                {
+                    numbers.Add(rand.Next(-100, 101));
+                }
+
+                File.WriteAllText(filePath, string.Join(" ", numbers));
+                Console.WriteLine($"Файл создан и заполнен {count} числами");
+
+                if (!File.Exists(filePath))
+                {
+                    Console.WriteLine("Ошибка: файл не существует");
+                    return;
+                }
+
+                string content = File.ReadAllText(filePath);
+                if (string.IsNullOrWhiteSpace(content))
+                {
+                    Console.WriteLine("Файл пуст");
+                    return;
+                }
+
+                string[] numberStrings = content.Split(new[] { ' ', '\t', '\r', '\n' },
+                    StringSplitOptions.RemoveEmptyEntries);
+
+                List<int> validNumbers = new List<int>();
+                List<string> invalidEntries = new List<string>();
+
+                foreach (string numStr in numberStrings)
+                {
+                    if (int.TryParse(numStr, out int num))
+                    {
+                        validNumbers.Add(num);
+                    }
+                    else
+                    {
+                        invalidEntries.Add(numStr);
+                    }
+                }
+
+                if (invalidEntries.Count > 0)
+                {
+                    Console.WriteLine("Некорректные данные в файле: " + string.Join(", ", invalidEntries));
+                }
+
+                if (validNumbers.Count == 0)
+                {
+                    Console.WriteLine("В файле нет корректных целых чисел");
+                    return;
+                }
+
+                // Подсчет четных чисел 
+                int evenCount = validNumbers.Count(num => num % 2 == 0);
+
+                Console.WriteLine($"\nСодержимое файла: {string.Join(", ", validNumbers)}");
+                Console.WriteLine($"Количество четных чисел: {evenCount}");
+                Console.WriteLine($"Общее количество чисел: {validNumbers.Count}");
+
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine("Ошибка: нет доступа к файлу или директории");
+            }
+            catch (DirectoryNotFoundException)
+            {
+                Console.WriteLine("Ошибка: директория не найдена");
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"Ошибка ввода-вывода: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Неожиданная ошибка: {ex.Message}");
+            }
+        }
+
+        static void CreateDirectory()
+        {
+            // Автоматическое создание пути к папке
+            string dirPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "NewFolder_" + DateTime.Now.ToString("yyyyMMdd_HHmmss"));
+            Console.WriteLine($"Папка будет создана: {dirPath}");
+
+            try
+            {
+                if (Directory.Exists(dirPath))
+                {
+                    Console.WriteLine("Папка уже существует");
+                    return;
+                }
+
+                Directory.CreateDirectory(dirPath);
+                Console.WriteLine($"Папка успешно создана: {dirPath}");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine("Ошибка: нет прав для создания папки");
+            }
+            catch (ArgumentException)
+            {
+                Console.WriteLine("Ошибка: неверный формат пути");
+            }
+            catch (PathTooLongException)
+            {
+                Console.WriteLine("Ошибка: путь слишком длинный");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при создании папки: {ex.Message}");
+            }
+        }
+
+        static void CreateTextFile()
+        {
+            // Автоматическое создание пути к файлу
+            string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "textfile_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".txt");
+            Console.WriteLine($"Файл будет создан: {filePath}");
+
+            try
+            {
+                Console.WriteLine("\nВыберите метод создания:");
+                Console.WriteLine("1 - File.Create()");
+                Console.WriteLine("2 - File.WriteAllText()");
+                Console.WriteLine("3 - File.AppendAllText()");
+                Console.WriteLine("4 - FileStream");
+                Console.WriteLine("5 - StreamWriter");
+
+                if (!int.TryParse(Console.ReadLine(), out int method) || method < 1 || method > 5)
+                {
+                    Console.WriteLine("Ошибка: выберите метод от 1 до 5");
+                    return;
+                }
+
+                switch (method)
+                {
+                    case 1:
+                        using (File.Create(filePath)) { }
+                        Console.WriteLine("Файл создан методом File.Create()");
+                        break;
+                    case 2:
+                        File.WriteAllText(filePath, "Текст записан методом File.WriteAllText()\nДата создания: " + DateTime.Now);
+                        Console.WriteLine("Файл создан и заполнен методом File.WriteAllText()");
+                        break;
+                    case 3:
+                        File.AppendAllText(filePath, "Текст дописан методом File.AppendAllText()\nДата: " + DateTime.Now + "\n");
+                        Console.WriteLine("Файл создан/дополнен методом File.AppendAllText()");
+                        break;
+                    case 4:
+                        using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                        {
+                            byte[] data = Encoding.UTF8.GetBytes("Текст записан через FileStream\nДата: " + DateTime.Now);
+                            fs.Write(data, 0, data.Length);
+                        }
+                        Console.WriteLine("Файл создан методом FileStream");
+                        break;
+                    case 5:
+                        using (StreamWriter writer = new StreamWriter(filePath))
+                        {
+                            writer.WriteLine("Текст записан через StreamWriter");
+                            writer.WriteLine("Дата создания: " + DateTime.Now);
+                        }
+                        Console.WriteLine("Файл создан методом StreamWriter");
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при создании файла: {ex.Message}");
+            }
+        }
+
+        static void ReadFromFile()
+        {
+            // Автоматический поиск файлов на рабочем столе
+            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            var textFiles = Directory.GetFiles(desktopPath, "*.txt");
+
+            if (textFiles.Length == 0)
+            {
+                Console.WriteLine("На рабочем столе нет текстовых файлов");
+                return;
+            }
+
+            Console.WriteLine("\nНайденные текстовые файлы на рабочем столе:");
+            for (int i = 0; i < textFiles.Length; i++)
+            {
+                Console.WriteLine($"{i + 1}. {Path.GetFileName(textFiles[i])}");
+            }
+
+            Console.Write("Выберите номер файла для чтения: ");
+            if (!int.TryParse(Console.ReadLine(), out int fileNumber) || fileNumber < 1 || fileNumber > textFiles.Length)
+            {
+                Console.WriteLine("Ошибка: выберите корректный номер файла");
+                return;
+            }
+
+            string filePath = textFiles[fileNumber - 1];
+            Console.WriteLine($"Выбран файл: {filePath}");
+
+            try
+            {
+                Console.WriteLine("\nВыберите метод чтения:");
+                Console.WriteLine("1 - File.ReadAllText()");
+                Console.WriteLine("2 - File.ReadAllLines()");
+                Console.WriteLine("3 - FileStream + StreamReader");
+                Console.WriteLine("4 - StreamReader напрямую");
+
+                if (!int.TryParse(Console.ReadLine(), out int method) || method < 1 || method > 4)
+                {
+                    Console.WriteLine("Ошибка: выберите метод от 1 до 4");
+                    return;
+                }
+
+                switch (method)
+                {
+                    case 1:
+                        string content = File.ReadAllText(filePath);
+                        Console.WriteLine($"Содержимое файла:\n{content}");
+                        break;
+                    case 2:
+                        string[] lines = File.ReadAllLines(filePath);
+                        Console.WriteLine($"Содержимое файла ({lines.Length} строк):");
+                        for (int i = 0; i < lines.Length; i++)
+                        {
+                            Console.WriteLine($"[{i + 1}]: {lines[i]}");
+                        }
+                        break;
+                    case 3:
+                        using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                        using (StreamReader reader = new StreamReader(fs, Encoding.UTF8))
+                        {
+                            Console.WriteLine("Содержимое файла (через FileStream):");
+                            string line;
+                            int lineNumber = 1;
+                            while ((line = reader.ReadLine()) != null)
+                            {
+                                Console.WriteLine($"[{lineNumber++}]: {line}");
+                            }
+                        }
+                        break;
+                    case 4:
+                        using (StreamReader reader = new StreamReader(filePath))
+                        {
+                            Console.WriteLine("Содержимое файла (через StreamReader):");
+                            Console.WriteLine(reader.ReadToEnd());
+                        }
+                        break;
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine("Ошибка: нет доступа к файлу");
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"Ошибка ввода-вывода: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при чтении файла: {ex.Message}");
+            }
+        }
+    }
+}
