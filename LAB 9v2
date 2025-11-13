@@ -1,0 +1,281 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace LAB_9.NET_WF
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            textBox2.Clear();
+
+            string path = Path.Combine(Environment.CurrentDirectory, "numbers.dat");
+            int[] numbers;
+
+            try
+            {
+                if (radioButton1.Checked)
+                {
+                    string input = textBox1.Text.Trim();
+                    if (string.IsNullOrWhiteSpace(input))
+                    {
+                        textBox2.Text = "Ошибка: не введено ни одного числа.";
+                        return;
+                    }
+
+                    var list = new List<int>();
+                    string[] parts = input.Split(new char[] { ' ', '\t', ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (string part in parts)
+                    {
+                        if (int.TryParse(part, out int num))
+                            list.Add(num);
+                        else
+                            textBox2.AppendText($"Пропущено некорректное значение: {part}\r\n");
+                    }
+
+                    if (list.Count == 0)
+                    {
+                        textBox2.AppendText("Ошибка: нет корректных целых чисел для записи.");
+                        return;
+                    }
+
+                    numbers = list.ToArray();
+                }
+                else if (radioButton2.Checked)
+                {
+
+                    if (!int.TryParse(textBox1.Text, out int count) || count <= 0)
+                    {
+                        textBox2.Text = "Ошибка: количество чисел должно быть целым числом > 0.";
+                        return;
+                    }
+
+                    numbers = new int[count];
+                    Random rnd = new Random();
+                    for (int i = 0; i < count; i++)
+                        numbers[i] = rnd.Next(-99, 100);
+
+                    textBox2.AppendText($"Сгенерировано случайных чисел: {count}\r\n");
+                }
+                else
+                {
+                    textBox2.Text = "Ошибка: выберите режим ввода чисел.";
+                    return;
+                }
+
+                using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Create)))
+                {
+                    foreach (int num in numbers)
+                        writer.Write(num);
+                }
+
+                textBox2.AppendText($"\nФайл успешно создан: {path}\r\n");
+
+                int evenCount = 0;
+                using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
+                {
+                    textBox2.AppendText("Считанные числа из файла:\r\n");
+                    while (reader.BaseStream.Position < reader.BaseStream.Length)
+                    {
+                        int number = reader.ReadInt32();
+                        textBox2.AppendText(number + " ");
+                        if (number % 2 == 0)
+                            evenCount++;
+                    }
+                }
+
+                textBox2.AppendText($"\r\nКоличество чётных чисел в файле: {evenCount}");
+            }
+            catch (Exception ex)
+            {
+                textBox2.Text = $"Ошибка: {ex.Message}";
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            textBox1.Clear();
+            textBox2.Clear();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            textBox3.Clear();
+
+            string path = Path.Combine(Environment.CurrentDirectory, "numbers.dat");
+
+            if (!File.Exists(path))
+            {
+                textBox3.Text = "Файл не найден! Сначала выполните Задание 1.";
+                return;
+            }
+
+            try
+            {
+                List<int> numbers = new List<int>();
+                using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
+                {
+                    while (reader.BaseStream.Position < reader.BaseStream.Length)
+                    {
+                        numbers.Add(reader.ReadInt32());
+                    }
+                }
+
+                textBox3.AppendText("Текущие числа в файле:\r\n");
+                textBox3.AppendText(string.Join(", ", numbers) + "\r\n");
+
+                if (!int.TryParse(textBox4.Text.Trim(), out int newValue))
+                {
+                    textBox3.AppendText("Ошибка: введите корректное целое число для вставки.");
+                    return;
+                }
+
+                Random rnd = new Random();
+                int position = rnd.Next(0, numbers.Count + 1);
+                textBox3.AppendText($"Случайно выбрана позиция: {position}\r\n");
+
+                numbers.Insert(position, newValue);
+
+                using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Create)))
+                {
+                    foreach (int num in numbers)
+                        writer.Write(num);
+                }
+
+                textBox3.AppendText("Число успешно вставлено.\r\n");
+                textBox3.AppendText("Обновлённые числа в файле:\r\n");
+                textBox3.AppendText(string.Join(", ", numbers));
+            }
+            catch (Exception ex)
+            {
+                textBox3.Text = "Ошибка: " + ex.Message;
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            textBox3.Clear();
+            textBox4.Clear();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            textBox6.Clear();
+
+            string sourceInput = textBox5.Text.Trim();
+            string destInput = textBox7.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(sourceInput) || string.IsNullOrWhiteSpace(destInput))
+            {
+                textBox6.Text = "Ошибка: укажите исходный и новый файлы.";
+                return;
+            }
+
+            string sourcePath = Path.IsPathRooted(sourceInput) ? sourceInput : Path.Combine(Environment.CurrentDirectory, sourceInput);
+            string destPath = Path.IsPathRooted(destInput) ? destInput : Path.Combine(Environment.CurrentDirectory, destInput);
+
+            if (!File.Exists(sourcePath))
+            {
+                textBox6.Text = "Исходный файл не найден: " + sourcePath;
+                return;
+            }
+
+            try
+            {
+                if (File.Exists(destPath))
+                {
+                    var result = MessageBox.Show("Такой файл уже существует. Перезаписать?",
+                                                 "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (result != DialogResult.Yes)
+                    {
+                        textBox6.Text = "Копирование отменено пользователем.";
+                        return;
+                    }
+                }
+
+                File.Copy(sourcePath, destPath, true);
+                textBox6.Text = $"Файл успешно скопирован!\r\nПуть к новому файлу: {destPath}";
+                textBox6.SelectionStart = 0;
+                textBox6.SelectionLength = 0;
+                textBox6.ScrollToCaret();
+            }
+            catch (Exception ex)
+            {
+                textBox6.Text = "Ошибка при копировании: " + ex.Message;
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            textBox5.Clear();
+            textBox6.Clear();
+            textBox7.Clear();
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            textBox10.Clear();
+
+            string input = textBox9.Text.Trim();
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                textBox10.Text = "Ошибка: укажите имя файла для получения информации.";
+                return;
+            }
+
+            string filePath = Path.IsPathRooted(input) ? input : Path.Combine(Environment.CurrentDirectory, input);
+
+            if (!File.Exists(filePath))
+            {
+                textBox10.Text = "Файл не найден: " + filePath;
+                return;
+            }
+
+            try
+            {
+                DateTime creationTime = File.GetCreationTime(filePath);
+                DateTime lastAccessTime = File.GetLastAccessTime(filePath);
+                DateTime lastWriteTime = File.GetLastWriteTime(filePath);
+
+                string info = $"Информация о файле: {filePath}\r\n" +
+                              $"Время создания: {creationTime}\r\n" +
+                              $"Время последнего доступа: {lastAccessTime}\r\n" +
+                              $"Время последней записи: {lastWriteTime}\r\n";
+
+                textBox10.Text = info;
+
+                string infoFilePath = Path.Combine(Environment.CurrentDirectory, "file_info.txt");
+                File.WriteAllText(infoFilePath, info);
+
+                textBox10.AppendText($"\r\nИнформация также сохранена в файл: {infoFilePath}");
+                textBox10.SelectionStart = 0;
+                textBox10.SelectionLength = 0;
+                textBox10.ScrollToCaret();
+            }
+            catch (Exception ex)
+            {
+                textBox10.Text = "Ошибка при получении информации: " + ex.Message;
+            }
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            textBox9.Clear();
+            textBox10.Clear();
+        }
+    }
+}
