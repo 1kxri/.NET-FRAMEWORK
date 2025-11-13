@@ -1,0 +1,271 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace LAB_9.NET
+{
+    internal class Program
+    {
+        static Random randomGenerator = new Random();
+        static void Main()
+        {
+            int mainChoice;
+        startMenu:
+            try
+            {
+                do
+                {
+                    Console.WriteLine("\nВыберите задание 1-4 или 0 для выхода:");
+                    Console.WriteLine("1 - Работа с двоичным файлом целых чисел");
+                    Console.WriteLine("2 - Вставить в случайную позицию в файл из задания 1 заданное пользователем число");
+                    Console.WriteLine("3 - Копирование заданного пользователем файла");
+                    Console.WriteLine("4 - Получение информации о файле");
+                    Console.WriteLine("0. Выход");
+                    Console.Write("Выберите действие: ");
+
+                    mainChoice = Convert.ToInt32(Console.ReadLine());
+
+                    switch (mainChoice)
+                    {
+                        case 1:
+                            {
+                                string filePath = Path.Combine(Environment.CurrentDirectory, "numbers.dat");
+                                int[] numberArray;
+
+                                Console.WriteLine($"Файл будет создан: {filePath}");
+                                Console.WriteLine("Выберите режим заполнения:");
+                                Console.WriteLine("1 - Ввести числа вручную");
+                                Console.WriteLine("2 - Заполнить случайными числами (от -99 до 99)");
+
+                            startFirst:
+                                Console.Write("Ваш выбор: ");
+                                string fillMode = Console.ReadLine();
+
+                                if (fillMode == "1")
+                                {
+                                    string userInput;
+                                    var numberList = new List<int>();
+
+                                    do
+                                    {
+                                        Console.WriteLine("Введите целые числа через пробел:");
+                                        userInput = Console.ReadLine();
+
+                                        string[] inputParts = userInput.Split(new char[] { ' ', '\t', ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
+
+                                        numberList.Clear();
+
+                                        foreach (string part in inputParts)
+                                        {
+                                            if (int.TryParse(part, out int parsedNumber))
+                                                numberList.Add(parsedNumber);
+                                        }
+
+                                        if (numberList.Count == 0)
+                                        {
+                                            Console.WriteLine("Не было введено ни одного целого числа, попробуйте снова\n");
+                                        }
+
+                                    } while (numberList.Count == 0);
+
+                                    numberArray = numberList.ToArray();
+                                }
+                                else if (fillMode == "2")
+                                {
+                                    int numbersCount;
+                                    do
+                                    {
+                                        Console.Write("Введите количество случайных чисел: ");
+                                    } while (!int.TryParse(Console.ReadLine(), out numbersCount) || numbersCount <= 0);
+
+                                    numberArray = new int[numbersCount];
+                                    for (int i = 0; i < numbersCount; i++)
+                                        numberArray[i] = randomGenerator.Next(-99, 100);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Несуществующий выбор, попробуйте снова\n");
+                                    goto startFirst;
+                                }
+
+                                try
+                                {
+                                    using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(filePath, FileMode.Create)))
+                                    {
+                                        foreach (int number in numberArray)
+                                        {
+                                            binaryWriter.Write(number);
+                                        }
+                                    }
+
+                                    Console.WriteLine("\nФайл создан и числа записаны в него.");
+
+                                    string fileContent = string.Join(" ", numberArray);
+                                    Console.WriteLine("\nСодержимое файла:");
+                                    Console.WriteLine(fileContent);
+
+                                    int evenNumbersCount = 0;
+                                    foreach (int number in numberArray)
+                                    {
+                                        if (number % 2 == 0)
+                                            evenNumbersCount++;
+                                    }
+
+                                    Console.WriteLine($"\nКоличество четных чисел: {evenNumbersCount}");
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine("Ошибка: " + ex.Message);
+                                }
+                            }
+                            break;
+                        case 2:
+                            {
+                                string numbersFilePath = Path.Combine(Environment.CurrentDirectory, "numbers.dat");
+
+                                if (!File.Exists(numbersFilePath))
+                                {
+                                    Console.WriteLine("Файл не найден! Сначала выполните Задание 1.");
+                                    break;
+                                }
+
+                                try
+                                {
+                                    List<int> numbersList = new List<int>();
+
+                                    using (BinaryReader binaryReader = new BinaryReader(File.Open(numbersFilePath, FileMode.Open)))
+                                    {
+                                        while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length)
+                                        {
+                                            numbersList.Add(binaryReader.ReadInt32());
+                                        }
+                                    }
+
+                                    Console.WriteLine("Текущие числа в файле: " + string.Join(", ", numbersList));
+
+                                    Console.Write("Введите число, которое нужно вставить: ");
+                                    int newNumber;
+                                    while (!int.TryParse(Console.ReadLine(), out newNumber))
+                                    {
+                                        Console.Write("Ошибка, значение должно быть целым числом: ");
+                                    }
+
+                                    int randomPosition = randomGenerator.Next(0, numbersList.Count + 1);
+
+                                    Console.WriteLine($"Случайно выбрана позиция: {randomPosition}");
+
+                                    numbersList.Insert(randomPosition, newNumber);
+
+                                    using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(numbersFilePath, FileMode.Create)))
+                                    {
+                                        foreach (int number in numbersList)
+                                            binaryWriter.Write(number);
+                                    }
+
+                                    Console.WriteLine("\nЧисло успешно вставлено");
+                                    Console.WriteLine("Обновлённое содержимое файла: " + string.Join(", ", numbersList));
+                                    Console.WriteLine("\nПуть к файлу: " + numbersFilePath);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine("Ошибка: " + ex.Message);
+                                }
+                            }
+                            break;
+                        case 3:
+                            {
+                                Console.Write("Введите имя или путь исходного файла: ");
+                                string sourceFileInput = Console.ReadLine();
+
+                                string sourceFilePath = Path.IsPathRooted(sourceFileInput) ? sourceFileInput : Path.Combine(Environment.CurrentDirectory, sourceFileInput);
+
+                                if (!File.Exists(sourceFilePath))
+                                {
+                                    Console.WriteLine("Исходный файл не найден!");
+                                    break;
+                                }
+
+                                Console.Write("Введите имя или путь для нового файла: ");
+                                string destinationFileInput = Console.ReadLine();
+
+                                string destinationFilePath = Path.IsPathRooted(destinationFileInput) ? destinationFileInput : Path.Combine(Environment.CurrentDirectory, destinationFileInput);
+
+                                try
+                                {
+                                    if (File.Exists(destinationFilePath))
+                                    {
+                                        Console.Write("Такой файл уже существует. Перезаписать? (да/нет): ");
+                                        string userAnswer = Console.ReadLine();
+                                        if (userAnswer.ToLower() != "да")
+                                        {
+                                            Console.WriteLine("Копирование отменено.");
+                                            break;
+                                        }
+                                    }
+
+                                    File.Copy(sourceFilePath, destinationFilePath, true);
+                                    Console.WriteLine($"Файл успешно скопирован!\nПуть к новому файлу: {destinationFilePath}");
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine("Ошибка при копировании: " + ex.Message);
+                                }
+                            }
+                            break;
+                        case 4:
+                            {
+                                Console.Write("Введите имя или путь файла для получения информации: ");
+                                string fileInput = Console.ReadLine();
+
+                                string targetFilePath = Path.IsPathRooted(fileInput) ? fileInput : Path.Combine(Environment.CurrentDirectory, fileInput);
+
+                                if (!File.Exists(targetFilePath))
+                                {
+                                    Console.WriteLine("Файл не найден!");
+                                    break;
+                                }
+
+                                try
+                                {
+                                    DateTime fileCreationTime = File.GetCreationTime(targetFilePath);
+                                    DateTime fileLastAccessTime = File.GetLastAccessTime(targetFilePath);
+                                    DateTime fileLastWriteTime = File.GetLastWriteTime(targetFilePath);
+
+                                    string fileInfo = $"Информация о файле: {targetFilePath}\n" +
+                                                      $"Время создания: {fileCreationTime}\n" +
+                                                      $"Время последнего доступа: {fileLastAccessTime}\n" +
+                                                      $"Время последней записи: {fileLastWriteTime}\n";
+
+                                    Console.WriteLine("\n" + fileInfo);
+
+                                    string infoFilePath = Path.Combine(Environment.CurrentDirectory, "file_info.txt");
+                                    File.WriteAllText(infoFilePath, fileInfo);
+
+                                    Console.WriteLine($"Информация сохранена в файл: {infoFilePath}");
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine("Ошибка при получении информации: " + ex.Message);
+                                }
+                            }
+                            break;
+                        case 0:
+                            Console.WriteLine("Выход из программы");
+                            break;
+                        default:
+                            Console.WriteLine("Несуществующее действие, попробуйте снова");
+                            break;
+                    }
+                } while (mainChoice != 0);
+            }
+            catch
+            {
+                Console.WriteLine("Ошибка. Введите целочисленное число");
+                goto startMenu;
+            }
+        }
+    }
+}
