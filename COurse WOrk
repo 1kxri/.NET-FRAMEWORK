@@ -1,0 +1,395 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
+using System.Xml.Linq;
+using static Course_Project.NET.Form1;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+
+namespace Course_Project.NET
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+            panel1.GetType()
+                .GetProperty("DoubleBuffered",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                .SetValue(panel1, true, null);
+
+            textBox1.Text = "Готово.";
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        // ======== Классы ========
+
+        public class Node
+        {
+            public int X;
+            public int Y;
+            public string Name;
+            public Color Color = Color.FromArgb(255, 230, 180);
+        }
+
+        public class Edge
+        {
+            public Node From;
+            public Node To;
+        }
+
+        private List<Node> nodes = new List<Node>();
+        private List<Edge> edges = new List<Edge>();
+
+        enum Mode { None, AddNode, AddEdge, Delete }
+        Mode mode = Mode.None;
+
+        Node firstEdgeNode = null;
+
+        const int R = 20;
+        Node dragNode = null;
+        bool dragging = false;
+
+        // ======== Генератор имен ========
+
+        string GenerateName()
+        {
+            int i = 1;
+            while (nodes.Any(n => n.Name == "x" + i))
+                i++;
+            return "x" + i;
+        }
+
+        // -------------------- КНОПКИ ---------------------
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string info =
+@"ИНФОРМАЦИЯ
+
+- Добавление вершин: нажмите 'Добавить вершины', затем кликните по панели.
+- Добавление соединений: нажмите 'Добавить соединения', кликните по первой вершине, затем по второй.
+- Перетаскивание: активно всегда — нажмите и держите ЛКМ на вершине, двигайте мышь.
+- Удаление элемента: нажмите 'Удалить элемент', затем кликните по вершине или по ребру.
+- Удалить все: очистка графа.
+- Сохранить / Открыть: сохраняет и загружает простой текстовый формат.
+- Топологическая сортировка: если граф оритентиованный, вершины расположатся в строку в топологическом порядке. Если есть цикл — будет сообщение об ошибке.";
+            MessageBox.Show(info, "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            mode = Mode.AddNode;
+            textBox1.Text = "Режим: добавление вершин.";
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            mode = Mode.AddEdge;
+            firstEdgeNode = null;
+            textBox1.Text = "Режим: добавление связей.";
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            nodes.Clear();
+            edges.Clear();
+            panel1.Invalidate();
+            textBox1.Text = "Полотно очищено.";
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.Filter = "Text|*.txt";
+            if (dlg.ShowDialog() != DialogResult.OK) return;
+
+            using (StreamWriter w = new StreamWriter(dlg.FileName))
+            {
+                foreach (Node n in nodes)
+                    w.WriteLine("N;" + n.Name + ";" + n.X + ";" + n.Y + ";" + n.Color.R + ";" + n.Color.G + ";" + n.Color.B);
+
+                foreach (Edge ed in edges)
+                    w.WriteLine("E;" + ed.From.Name + ";" + ed.To.Name);
+            }
+
+            textBox1.Text = "Граф сохранён.";
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "Text|*.txt";
+            if (dlg.ShowDialog() != DialogResult.OK) return;
+
+            nodes.Clear();
+            edges.Clear();
+
+            string[] lines = File.ReadAllLines(dlg.FileName);
+            foreach (string line in lines)
+            {
+                string[] p = line.Split(';');
+                if (p[0] == "N")
+                {
+                    nodes.Add(new Node
+                    {
+                        Name = p[1],
+                        X = int.Parse(p[2]),
+                        Y = int.Parse(p[3]),
+                        Color = Color.FromArgb(int.Parse(p[4]), int.Parse(p[5]), int.Parse(p[6]))
+                    });
+                }
+            }
+
+            foreach (string line in lines)
+            {
+                string[] p = line.Split(';');
+                if (p[0] == "E")
+                {
+                    Node f = nodes.First(n => n.Name == p[1]);
+                    Node t = nodes.First(n => n.Name == p[2]);
+                    edges.Add(new Edge { From = f, To = t });
+                }
+            }
+
+            panel1.Invalidate();
+            textBox1.Text = "Граф открыт.";
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            Dictionary<Node, int> indeg = nodes.ToDictionary(n => n, n => 0);
+
+            foreach (Edge ed in edges)
+                indeg[ed.To]++;
+
+            Queue<Node> q = new Queue<Node>(indeg.Where(i => i.Value == 0).Select(i => i.Key));
+
+            List<Node> result = new List<Node>();
+
+            while (q.Count > 0)
+            {
+                Node n = q.Dequeue();
+                result.Add(n);
+
+                foreach (Edge ed in edges.Where(ed => ed.From == n))
+                {
+                    indeg[ed.To]--;
+                    if (indeg[ed.To] == 0)
+                        q.Enqueue(ed.To);
+                }
+            }
+
+            if (result.Count != nodes.Count)
+            {
+                textBox1.Text = "Граф содержит цикл — топологическая сортировка невозможна.";
+                return;
+            }
+
+            int startX = 80;
+            int y = panel1.Height / 2;
+            int step = 120;
+
+            for (int i = 0; i < result.Count; i++)
+            {
+                result[i].X = startX + i * step;
+                result[i].Y = y;
+            }
+
+            panel1.Invalidate();
+            textBox1.Text = "Топологическая сортировка выполнена.";
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            mode = Mode.Delete;
+            textBox1.Text = "Режим: удаление.";
+        }
+
+        // ======== Мышь на холсте ========
+
+        private void panel1_MouseDown(object sender, MouseEventArgs e)
+        {
+            Node hit = FindNode(e.Location);
+
+            // универсальное перетаскивание
+            if (hit != null)
+            {
+                dragNode = hit;
+                dragging = true;
+            }
+
+            if (mode == Mode.AddNode)
+            {
+                string nm = GenerateName();
+                nodes.Add(new Node { X = e.X, Y = e.Y, Name = nm });
+                textBox1.Text = $"Вершина {nm} добавлена.";
+                panel1.Invalidate();
+                return;
+            }
+
+            if (mode == Mode.AddEdge)
+            {
+                if (hit == null) return;
+
+                if (firstEdgeNode == null)
+                {
+                    firstEdgeNode = hit;
+                    textBox1.Text = $"Выбрана первая вершина: {hit.Name}";
+                }
+                else
+                {
+                    if (firstEdgeNode == hit)
+                    {
+                        textBox1.Text = "Нельзя соединить вершину саму с собой.";
+                        firstEdgeNode = null;
+                        return;
+                    }
+
+                    if (edges.Any(ed => ed.From == firstEdgeNode && ed.To == hit))
+                    {
+                        textBox1.Text = "Такое ребро уже существует.";
+                        firstEdgeNode = null;
+                        return;
+                    }
+
+                    edges.Add(new Edge { From = firstEdgeNode, To = hit });
+                    textBox1.Text = $"Создано ребро {firstEdgeNode.Name} → {hit.Name}";
+                    firstEdgeNode = null;
+                    panel1.Invalidate();
+                }
+
+                return;
+            }
+
+            if (mode == Mode.Delete)
+            {
+                if (hit != null) 
+                {
+                    edges.RemoveAll(ed => ed.From == hit || ed.To == hit);
+                    nodes.Remove(hit);
+                    textBox1.Text = $"Удалена вершина {hit.Name}";
+                    panel1.Invalidate();
+                    return;
+                }
+                else 
+                {
+                    Edge hitEdge = edges.FirstOrDefault(ed => IsPointOnEdge(e.Location, ed));
+                    if (hitEdge != null)
+                    {
+                        edges.Remove(hitEdge);
+                        textBox1.Text = $"Удалено ребро {hitEdge.From.Name} → {hitEdge.To.Name}";
+                        panel1.Invalidate();
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void panel1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (dragging && dragNode != null)
+            {
+                dragNode.X = e.X;
+                dragNode.Y = e.Y;
+                panel1.Invalidate();
+            }
+        }
+
+        private void panel1_MouseUp(object sender, MouseEventArgs e)
+        {
+            dragging = false;
+            dragNode = null;
+        }
+
+        // ======== Поиск ========
+
+        Node FindNode(Point p)
+        {
+            return nodes.FirstOrDefault(n =>
+                Math.Sqrt((p.X - n.X) * (p.X - n.X) + (p.Y - n.Y) * (p.Y - n.Y)) <= R);
+        }
+
+        bool IsPointOnEdge(Point p, Edge ed)
+        {
+            const int tolerance = 5;
+            float dx = ed.To.X - ed.From.X;
+            float dy = ed.To.Y - ed.From.Y;
+            float length = (float)Math.Sqrt(dx * dx + dy * dy);
+            if (length < 0.001f) return false;
+
+            float t = ((p.X - ed.From.X) * dx + (p.Y - ed.From.Y) * dy) / (length * length);
+            t = Math.Max(0, Math.Min(1, t));
+
+            float nearestX = ed.From.X + t * dx;
+            float nearestY = ed.From.Y + t * dy;
+
+            float dist = (float)Math.Sqrt((p.X - nearestX) * (p.X - nearestX) + (p.Y - nearestY) * (p.Y - nearestY));
+            return dist <= tolerance;
+        }
+
+        // ======== Отрисовка ========
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            foreach (Edge ed in edges)
+                DrawArrow(g, ed.From, ed.To);
+
+            foreach (Node n in nodes)
+            {
+                g.FillEllipse(new SolidBrush(n.Color), n.X - R, n.Y - R, R * 2, R * 2);
+                g.DrawEllipse(Pens.Black, n.X - R, n.Y - R, R * 2, R * 2);
+
+                StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
+                g.DrawString(n.Name, new Font("Arial", 11, FontStyle.Bold),
+                    Brushes.Black,
+                    new RectangleF(n.X - R, n.Y - R, R * 2, R * 2),
+                    sf);
+            }
+        }
+
+        void DrawArrow(Graphics g, Node from, Node to)
+        {
+            float dx = to.X - from.X;
+            float dy = to.Y - from.Y;
+            float dist = (float)Math.Sqrt(dx * dx + dy * dy);
+            if (dist < 1) return;
+
+            float nx = dx / dist;
+            float ny = dy / dist;
+
+            float x1 = from.X + nx * R;
+            float y1 = from.Y + ny * R;
+
+            float x2 = to.X - nx * R;
+            float y2 = to.Y - ny * R;
+
+            using (Pen pen = new Pen(Color.DarkBlue, 2)) 
+            {
+                pen.CustomEndCap = new AdjustableArrowCap(8, 6, true); 
+                g.DrawLine(pen, x1, y1, x2, y2);
+            }
+        }
+
+    }
+}
+
+
+        
+    
