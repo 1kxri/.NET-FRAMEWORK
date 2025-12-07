@@ -19,13 +19,22 @@ namespace Course_Project.NET
 {
     public partial class Form1 : Form
     {
+        private string graphFolderPath;
+
         public Form1()
         {
             InitializeComponent();
+
+            panel1.AutoScroll = true;
+            panel1.AutoScrollMinSize = new Size(2000, 2000);
+
             panel1.GetType()
                 .GetProperty("DoubleBuffered",
                 System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
                 .SetValue(panel1, true, null);
+
+            string projectFolder = Directory.GetParent(Application.StartupPath).Parent.FullName;
+            graphFolderPath = Path.Combine(projectFolder, "Graph");
 
             textBox1.Text = "Готово.";
         }
@@ -85,7 +94,7 @@ namespace Course_Project.NET
 - Перетаскивание: активно всегда — нажмите и держите ЛКМ на вершине, двигайте мышь.
 - Удаление элемента: нажмите 'Удалить элемент', затем кликните по вершине или по ребру.
 - Удалить все: очистка графа.
-- Сохранить / Открыть: сохраняет и загружает простой текстовый формат.
+- Сохранить / Открыть: сохраняет и загружает XML формат.
 - Топологическая сортировка: если граф оритентиованный, вершины расположатся в строку в топологическом порядке. Если есть цикл — будет сообщение об ошибке.";
             MessageBox.Show(info, "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -107,66 +116,115 @@ namespace Course_Project.NET
         {
             nodes.Clear();
             edges.Clear();
+            UpdateScrollArea();
             panel1.Invalidate();
             textBox1.Text = "Полотно очищено.";
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
-            SaveFileDialog dlg = new SaveFileDialog();
-            dlg.Filter = "Text|*.txt";
-            if (dlg.ShowDialog() != DialogResult.OK) return;
-
-            using (StreamWriter w = new StreamWriter(dlg.FileName))
+            if (!Directory.Exists(graphFolderPath))
             {
-                foreach (Node n in nodes)
-                    w.WriteLine("N;" + n.Name + ";" + n.X + ";" + n.Y + ";" + n.Color.R + ";" + n.Color.G + ";" + n.Color.B);
-
-                foreach (Edge ed in edges)
-                    w.WriteLine("E;" + ed.From.Name + ";" + ed.To.Name);
+                Directory.CreateDirectory(graphFolderPath);
             }
 
-            textBox1.Text = "Граф сохранён.";
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.Filter = "XML files|*.xml";
+            dlg.InitialDirectory = graphFolderPath; 
+            dlg.FileName = "graph.xml";
+
+            if (dlg.ShowDialog() != DialogResult.OK) return;
+
+            XDocument doc = new XDocument(
+                new XElement("Graph",
+                    new XElement("Nodes",
+                        from node in nodes
+                        select new XElement("Node",
+                            new XElement("Name", node.Name),
+                            new XElement("X", node.X),
+                            new XElement("Y", node.Y),
+                            new XElement("Color",
+                                new XElement("R", node.Color.R),
+                                new XElement("G", node.Color.G),
+                                new XElement("B", node.Color.B)
+                            )
+                        )
+                    ),
+                    new XElement("Edges",
+                        from edge in edges
+                        select new XElement("Edge",
+                            new XElement("From", edge.From.Name),
+                            new XElement("To", edge.To.Name)
+                        )
+                    )
+                )
+            );
+
+            doc.Save(dlg.FileName);
+            textBox1.Text = "Граф сохранён в XML формате.";
         }
 
         private void button6_Click(object sender, EventArgs e)
         {
+            if (!Directory.Exists(graphFolderPath))
+            {
+                Directory.CreateDirectory(graphFolderPath);
+            }
+
             OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Filter = "Text|*.txt";
+            dlg.Filter = "XML files|*.xml";
+            dlg.InitialDirectory = graphFolderPath; 
+
             if (dlg.ShowDialog() != DialogResult.OK) return;
 
-            nodes.Clear();
-            edges.Clear();
-
-            string[] lines = File.ReadAllLines(dlg.FileName);
-            foreach (string line in lines)
+            try
             {
-                string[] p = line.Split(';');
-                if (p[0] == "N")
+                XDocument doc = XDocument.Load(dlg.FileName);
+                nodes.Clear();
+                edges.Clear();
+
+                var nodeElements = doc.Root.Element("Nodes").Elements("Node");
+                foreach (var nodeElement in nodeElements)
                 {
+                    string name = nodeElement.Element("Name").Value;
+                    int x = int.Parse(nodeElement.Element("X").Value);
+                    int y = int.Parse(nodeElement.Element("Y").Value);
+
+                    var colorElement = nodeElement.Element("Color");
+                    int r = int.Parse(colorElement.Element("R").Value);
+                    int g = int.Parse(colorElement.Element("G").Value);
+                    int b = int.Parse(colorElement.Element("B").Value);
+
                     nodes.Add(new Node
                     {
-                        Name = p[1],
-                        X = int.Parse(p[2]),
-                        Y = int.Parse(p[3]),
-                        Color = Color.FromArgb(int.Parse(p[4]), int.Parse(p[5]), int.Parse(p[6]))
+                        Name = name,
+                        X = x,
+                        Y = y,
+                        Color = Color.FromArgb(r, g, b)
                     });
                 }
-            }
 
-            foreach (string line in lines)
-            {
-                string[] p = line.Split(';');
-                if (p[0] == "E")
+                var edgeElements = doc.Root.Element("Edges").Elements("Edge");
+                foreach (var edgeElement in edgeElements)
                 {
-                    Node f = nodes.First(n => n.Name == p[1]);
-                    Node t = nodes.First(n => n.Name == p[2]);
-                    edges.Add(new Edge { From = f, To = t });
-                }
-            }
+                    string fromName = edgeElement.Element("From").Value;
+                    string toName = edgeElement.Element("To").Value;
 
-            panel1.Invalidate();
-            textBox1.Text = "Граф открыт.";
+                    Node fromNode = nodes.First(n => n.Name == fromName);
+                    Node toNode = nodes.First(n => n.Name == toName);
+
+                    edges.Add(new Edge { From = fromNode, To = toNode });
+                }
+
+                UpdateScrollArea();
+                panel1.Invalidate();
+                textBox1.Text = "Граф загружен из XML файла.";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при загрузке файла: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBox1.Text = "Ошибка при загрузке графа.";
+            }
         }
 
         private void button7_Click(object sender, EventArgs e)
@@ -209,6 +267,7 @@ namespace Course_Project.NET
                 result[i].Y = y;
             }
 
+            UpdateScrollArea();
             panel1.Invalidate();
             textBox1.Text = "Топологическая сортировка выполнена.";
         }
@@ -223,9 +282,10 @@ namespace Course_Project.NET
 
         private void panel1_MouseDown(object sender, MouseEventArgs e)
         {
-            Node hit = FindNode(e.Location);
+            Point absolutePoint = GetAbsolutePoint(e.Location);
 
-            // универсальное перетаскивание
+            Node hit = FindNode(absolutePoint);
+
             if (hit != null)
             {
                 dragNode = hit;
@@ -235,7 +295,8 @@ namespace Course_Project.NET
             if (mode == Mode.AddNode)
             {
                 string nm = GenerateName();
-                nodes.Add(new Node { X = e.X, Y = e.Y, Name = nm });
+                nodes.Add(new Node { X = absolutePoint.X, Y = absolutePoint.Y, Name = nm });
+                UpdateScrollArea();
                 textBox1.Text = $"Вершина {nm} добавлена.";
                 panel1.Invalidate();
                 return;
@@ -267,6 +328,7 @@ namespace Course_Project.NET
                     }
 
                     edges.Add(new Edge { From = firstEdgeNode, To = hit });
+                    UpdateScrollArea();
                     textBox1.Text = $"Создано ребро {firstEdgeNode.Name} → {hit.Name}";
                     firstEdgeNode = null;
                     panel1.Invalidate();
@@ -277,20 +339,22 @@ namespace Course_Project.NET
 
             if (mode == Mode.Delete)
             {
-                if (hit != null) 
+                if (hit != null)
                 {
                     edges.RemoveAll(ed => ed.From == hit || ed.To == hit);
                     nodes.Remove(hit);
+                    UpdateScrollArea();
                     textBox1.Text = $"Удалена вершина {hit.Name}";
                     panel1.Invalidate();
                     return;
                 }
-                else 
+                else
                 {
-                    Edge hitEdge = edges.FirstOrDefault(ed => IsPointOnEdge(e.Location, ed));
+                    Edge hitEdge = edges.FirstOrDefault(ed => IsPointOnEdge(absolutePoint, ed));
                     if (hitEdge != null)
                     {
                         edges.Remove(hitEdge);
+                        UpdateScrollArea();
                         textBox1.Text = $"Удалено ребро {hitEdge.From.Name} → {hitEdge.To.Name}";
                         panel1.Invalidate();
                         return;
@@ -303,8 +367,11 @@ namespace Course_Project.NET
         {
             if (dragging && dragNode != null)
             {
-                dragNode.X = e.X;
-                dragNode.Y = e.Y;
+                Point absolutePoint = GetAbsolutePoint(e.Location);
+
+                dragNode.X = absolutePoint.X;
+                dragNode.Y = absolutePoint.Y;
+                UpdateScrollArea();
                 panel1.Invalidate();
             }
         }
@@ -315,15 +382,34 @@ namespace Course_Project.NET
             dragNode = null;
         }
 
-        // ======== Поиск ========
+        // ======== Вспомогательные методы для работы с координатами ========
 
-        Node FindNode(Point p)
+        private Point GetAbsolutePoint(Point screenPoint)
         {
-            return nodes.FirstOrDefault(n =>
-                Math.Sqrt((p.X - n.X) * (p.X - n.X) + (p.Y - n.Y) * (p.Y - n.Y)) <= R);
+            return new Point(
+                screenPoint.X + panel1.AutoScrollPosition.X,
+                screenPoint.Y + panel1.AutoScrollPosition.Y
+            );
         }
 
-        bool IsPointOnEdge(Point p, Edge ed)
+        private Point GetScreenPoint(Point absolutePoint)
+        {
+            return new Point(
+                absolutePoint.X - panel1.AutoScrollPosition.X,
+                absolutePoint.Y - panel1.AutoScrollPosition.Y
+            );
+        }
+
+        // ======== Поиск ========
+
+        Node FindNode(Point absolutePoint)
+        {
+            return nodes.FirstOrDefault(n =>
+                Math.Sqrt((absolutePoint.X - n.X) * (absolutePoint.X - n.X) +
+                         (absolutePoint.Y - n.Y) * (absolutePoint.Y - n.Y)) <= R);
+        }
+
+        bool IsPointOnEdge(Point absolutePoint, Edge ed)
         {
             const int tolerance = 5;
             float dx = ed.To.X - ed.From.X;
@@ -331,14 +417,36 @@ namespace Course_Project.NET
             float length = (float)Math.Sqrt(dx * dx + dy * dy);
             if (length < 0.001f) return false;
 
-            float t = ((p.X - ed.From.X) * dx + (p.Y - ed.From.Y) * dy) / (length * length);
+            float t = ((absolutePoint.X - ed.From.X) * dx + (absolutePoint.Y - ed.From.Y) * dy) / (length * length);
             t = Math.Max(0, Math.Min(1, t));
 
             float nearestX = ed.From.X + t * dx;
             float nearestY = ed.From.Y + t * dy;
 
-            float dist = (float)Math.Sqrt((p.X - nearestX) * (p.X - nearestX) + (p.Y - nearestY) * (p.Y - nearestY));
+            float dist = (float)Math.Sqrt((absolutePoint.X - nearestX) * (absolutePoint.X - nearestX) +
+                                        (absolutePoint.Y - nearestY) * (absolutePoint.Y - nearestY));
             return dist <= tolerance;
+        }
+
+        // ======== Обновление области скроллинга ========
+
+        private void UpdateScrollArea()
+        {
+            if (nodes.Count == 0)
+            {
+                panel1.AutoScrollMinSize = new Size(2000, 2000);
+                return;
+            }
+
+            int minX = nodes.Min(n => n.X) - 100;
+            int maxX = nodes.Max(n => n.X) + 100;
+            int minY = nodes.Min(n => n.Y) - 100;
+            int maxY = nodes.Max(n => n.Y) + 100;
+
+            int requiredWidth = Math.Max(panel1.Width, maxX - minX);
+            int requiredHeight = Math.Max(panel1.Height, maxY - minY);
+
+            panel1.AutoScrollMinSize = new Size(requiredWidth, requiredHeight);
         }
 
         // ======== Отрисовка ========
@@ -347,6 +455,8 @@ namespace Course_Project.NET
         {
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            g.TranslateTransform(panel1.AutoScrollPosition.X, panel1.AutoScrollPosition.Y);
 
             foreach (Edge ed in edges)
                 DrawArrow(g, ed.From, ed.To);
@@ -380,16 +490,11 @@ namespace Course_Project.NET
             float x2 = to.X - nx * R;
             float y2 = to.Y - ny * R;
 
-            using (Pen pen = new Pen(Color.DarkBlue, 2)) 
+            using (Pen pen = new Pen(Color.DarkBlue, 2))
             {
-                pen.CustomEndCap = new AdjustableArrowCap(8, 6, true); 
+                pen.CustomEndCap = new AdjustableArrowCap(8, 6, true);
                 g.DrawLine(pen, x1, y1, x2, y2);
             }
         }
-
     }
 }
-
-
-        
-    
