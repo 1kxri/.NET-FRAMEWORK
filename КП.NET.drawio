@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 YaBrowser/25.10.0.0 Safari/537.36" version="29.2.4">
   <diagram name="Страница — 1" id="vYifYDOqZS8oL4Sab2rS">
-    <mxGraphModel dx="1007" dy="588" grid="0" gridSize="5" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1421" dy="829" grid="0" gridSize="5" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -646,6 +646,27 @@
         </mxCell>
         <mxCell id="jnjSTWwuG9VGWquJAaMI-132" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" value="&lt;font style=&quot;font-size: 8px;&quot;&gt;Конец&lt;/font&gt;" vertex="1">
           <mxGeometry height="30" width="60" x="1609.66" y="584" as="geometry" />
+        </mxCell>
+        <mxCell id="sVrYhLrBI1cTzZDFzeGp-1" parent="1" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160.3" x="1325" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="sVrYhLrBI1cTzZDFzeGp-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;span style=&quot;font-size: 8px;&quot;&gt;nodes, edges&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="123" x="1343" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="sVrYhLrBI1cTzZDFzeGp-3" parent="1" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fontSize=8;" value="List&amp;lt;Node&amp;gt;, null" vertex="1">
+          <mxGeometry height="30" width="160.3" x="1337" y="141" as="geometry" />
+        </mxCell>
+        <mxCell id="sVrYhLrBI1cTzZDFzeGp-5" parent="1" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160.3" x="1355" y="225" as="geometry" />
+        </mxCell>
+        <mxCell id="sVrYhLrBI1cTzZDFzeGp-6" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;span style=&quot;font-size: 8px;&quot;&gt;List&amp;lt;Node&amp;gt; sortedNodes&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="123" x="1373" y="225" as="geometry" />
+        </mxCell>
+        <mxCell id="sVrYhLrBI1cTzZDFzeGp-7" parent="1" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" value="" vertex="1">
+          <mxGeometry height="30" width="160.3" x="1347" y="273" as="geometry" />
+        </mxCell>
+        <mxCell id="sVrYhLrBI1cTzZDFzeGp-8" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;span style=&quot;font-size: 8px;&quot;&gt;panel1.Invalidate(),&amp;nbsp;UpdateScrollArea()&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="123" x="1365" y="273" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
